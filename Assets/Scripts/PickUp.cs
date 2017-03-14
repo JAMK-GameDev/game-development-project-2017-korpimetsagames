@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 
 public class PickUp : MonoBehaviour
 {
-    int distanceToItem = 2;
+    float distanceToItem = 2f;
+    Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
 
     void Update()
     {
@@ -21,25 +21,13 @@ public class PickUp : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Item")
                 {
-                    Destroy(hit.collider.gameObject);
+                    transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
+                    transform.localRotation = Quaternion.identity;
+                    transform.localPosition = eqippedItemPos;
+                    transform.FindChild("PickUpZone").GetComponent<ShowPickUpText>().Disable();
                 }
             }
         }
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Player")
-        {
-            GameObject.Find("PickUpText").GetComponent<Text>().text = "Press E to pick up item";
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Player")
-        {
-            GameObject.Find("PickUpText").GetComponent<Text>().text = "";
-        }
-    }
 }
