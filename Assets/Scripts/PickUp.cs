@@ -20,7 +20,7 @@ public class PickUp : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Item")
                 {
-                    GameObject.FindGameObjectWithTag("Inventory").GetComponent<Inventory>().addItem(gameObject);
+                    GameObject.FindGameObjectWithTag("Inventory").GetComponent<Inventory>().AddItem(gameObject);
                     transform.FindChild("PickUpZone").GetComponent<ShowPickUpText>().Disable();
                 }
             }
