@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class ShowPickUpText : MonoBehaviour
 {
-
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
