@@ -1,17 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour {
 
     public GameObject inventoryUI = null;
     List<GameObject> items = new List<GameObject>();
     GameObject equippedItem = null;
-    Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
+    Vector3 eqippedItemPos = new Vector3(1.27f, -0.6f, 1.38f);
 
     void Start()
     {
-        ToggleInventoryUI(); // Disable inventory UI
+        ToggleInventoryUI(); // Disable inventory UI at start
     }
 
     void Update()
@@ -25,11 +26,14 @@ public class Inventory : MonoBehaviour {
     public void AddItem(GameObject item)
     {
         items.Add(item);
-        item.transform.parent = gameObject.transform;
         if (equippedItem == null)
         {
             EquipItem(item);
-        }   
+        }
+        else
+        {
+            UnequipItem(item);
+        }
     }
 
     void EquipItem(GameObject item)
@@ -55,4 +59,5 @@ public class Inventory : MonoBehaviour {
             inventoryUI.SetActive(!inventoryUI.activeSelf);
         }
     }
+    
 }

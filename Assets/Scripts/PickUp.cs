@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PickUp : MonoBehaviour
 {
-    float distanceToItem = 2f;
+    bool inZone = false;
 
     void Update()
     {
@@ -12,19 +13,36 @@ public class PickUp : MonoBehaviour
 
     void Collect()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && inZone)
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, distanceToItem))
-            {
-                if (hit.collider.gameObject.tag == "Item")
-                {
-                    GameObject.FindGameObjectWithTag("Inventory").GetComponent<Inventory>().AddItem(gameObject);
-                    transform.FindChild("PickUpZone").GetComponent<ShowPickUpText>().Disable();
-                }
-            }
+            GameObject.FindGameObjectWithTag("Inventory").GetComponent<Inventory>().AddItem(gameObject);
+            DisableText();
         }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            GameObject.Find("PickUpText").GetComponent<Text>().text = "E to pick up";
+            inZone = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            GameObject.Find("PickUpText").GetComponent<Text>().text = "";
+            inZone = false;
+        }
+    }
+
+    void DisableText()
+    {
+        GetComponent<Collider>().enabled = false;
+        GameObject.Find("PickUpText").GetComponent<Text>().text = "";
+        inZone = false;
     }
 
 }
