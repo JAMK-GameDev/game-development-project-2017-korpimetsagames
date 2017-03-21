@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class Inventory : MonoBehaviour {
 
     public GameObject inventoryUI = null;
+    public GameObject flashlight = null;
     List<GameObject> items = new List<GameObject>();
     GameObject equippedItem = null;
     Vector3 eqippedItemPos = new Vector3(1.27f, -0.6f, 1.38f);
@@ -43,6 +44,12 @@ public class Inventory : MonoBehaviour {
         item.transform.localRotation = Quaternion.identity;
         item.transform.localPosition = eqippedItemPos;
         equippedItem = item;
+
+        // Enable flashlight effect
+        if (equippedItem.gameObject.name == "Flashlight" && flashlight != null)
+        {
+            flashlight.SetActive(true);
+        }
     }
 
     void UnequipItem(GameObject item)
@@ -50,6 +57,12 @@ public class Inventory : MonoBehaviour {
         item.SetActive(false);
         item.transform.parent = GameObject.FindGameObjectWithTag("Inventory").transform;
         equippedItem = null;
+
+        // Disable flashlight effect
+        if (item.gameObject.name == "Flashlight" && flashlight != null)
+        {
+            flashlight.SetActive(false);
+        }
     }
 
     void ToggleInventoryUI()
