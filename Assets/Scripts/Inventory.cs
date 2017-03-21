@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityStandardAssets.Characters.FirstPerson;
 
 public class Inventory : MonoBehaviour {
 
@@ -9,7 +10,7 @@ public class Inventory : MonoBehaviour {
     public GameObject flashlight = null;
     List<GameObject> items = new List<GameObject>();
     GameObject equippedItem = null;
-    Vector3 eqippedItemPos = new Vector3(1.27f, -0.6f, 1.38f);
+    Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
 
     void Start()
     {
@@ -37,7 +38,7 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    void EquipItem(GameObject item)
+    public void EquipItem(GameObject item)
     {
         item.SetActive(true);
         item.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
@@ -52,7 +53,7 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    void UnequipItem(GameObject item)
+    public void UnequipItem(GameObject item)
     {
         item.SetActive(false);
         item.transform.parent = GameObject.FindGameObjectWithTag("Inventory").transform;
@@ -70,6 +71,18 @@ public class Inventory : MonoBehaviour {
         if (inventoryUI != null)
         {
             inventoryUI.SetActive(!inventoryUI.activeSelf);
+            if (inventoryUI.activeSelf)
+            {
+                // TODO: Disable only mouse look, not the whole controller
+                transform.parent.gameObject.GetComponent<FirstPersonController>().enabled = false;
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Confined;
+                Cursor.visible = true;
+            }
+            else
+            {
+                transform.parent.gameObject.GetComponent<FirstPersonController>().enabled = true;
+            }
         }
     }
     
