@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
+using System.Linq;
 
 public class Inventory : MonoBehaviour {
 
     public GameObject inventoryUI = null;
+    public Transform inventoryUIContent = null;
     public GameObject flashlight = null;
     public FirstPersonController controller = null;
+    public GameObject uiButton = null;
     List<GameObject> items = new List<GameObject>();
     GameObject equippedItem = null;
     Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
+    bool hasFlight = false;
 
     void Start()
     {
@@ -24,23 +28,41 @@ public class Inventory : MonoBehaviour {
         {
             ToggleInventoryUI();
         }
+
+        // Hotkey to equip flashlight
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (hasFlight && equippedItem.name != "Flashlight" )
+            {
+                GameObject flashlight = items.Where(obj => obj.name == "Flashlight").SingleOrDefault();
+                EquipItem(flashlight);
+            }
+        }
     }
 
     public void AddItem(GameObject item)
     {
         items.Add(item);
+        AddUIButton(item);
+        if (item.name == "Flashlight") { hasFlight = true; }
         if (equippedItem == null)
         {
             EquipItem(item);
         }
         else
         {
-            UnequipItem(item);
+            item.SetActive(false);
+            item.transform.parent = GameObject.FindGameObjectWithTag("Inventory").transform;
         }
     }
 
     public void EquipItem(GameObject item)
     {
+        if (equippedItem != null)
+        {
+            UnequipItem(equippedItem);
+        }
+
         item.SetActive(true);
         item.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
         item.transform.localRotation = Quaternion.identity;
@@ -88,5 +110,13 @@ public class Inventory : MonoBehaviour {
             }
         }
     }
-    
+
+    public void AddUIButton(GameObject item)
+    {
+        GameObject go = Instantiate(uiButton) as GameObject;
+        go.GetComponentInChildren<Text>().text = item.name;
+        go.GetComponent<Button>().onClick.AddListener(delegate{ EquipItem(item); });
+        go.transform.SetParent(inventoryUIContent, false);
+    }
+
 }

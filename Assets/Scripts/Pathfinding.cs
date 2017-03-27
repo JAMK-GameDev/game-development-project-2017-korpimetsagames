@@ -20,7 +20,7 @@ public class Pathfinding : MonoBehaviour {
 
         if (Physics.Raycast(ray, out hit))
         {
-            print("Found an object: " + hit.transform.name);
+            //print("Found an object: " + hit.transform.name);
 
             if (hit.collider.tag.Equals("Player"))
             {
@@ -29,7 +29,7 @@ public class Pathfinding : MonoBehaviour {
         }
         else
         {
-            print("I see nothing");
+            //print("I see nothing");
         }
 
 
