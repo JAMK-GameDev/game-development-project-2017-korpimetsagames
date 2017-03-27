@@ -8,6 +8,7 @@ public class Inventory : MonoBehaviour {
 
     public GameObject inventoryUI = null;
     public GameObject flashlight = null;
+    public FirstPersonController controller = null;
     List<GameObject> items = new List<GameObject>();
     GameObject equippedItem = null;
     Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
@@ -73,15 +74,17 @@ public class Inventory : MonoBehaviour {
             inventoryUI.SetActive(!inventoryUI.activeSelf);
             if (inventoryUI.activeSelf)
             {
-                // TODO: Disable only mouse look, not the whole controller
-                transform.parent.gameObject.GetComponent<FirstPersonController>().enabled = false;
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.lockState = CursorLockMode.Confined;
-                Cursor.visible = true;
+                if (controller != null)
+                {
+                    controller.DisableMouseLook(true);
+                }
             }
             else
             {
-                transform.parent.gameObject.GetComponent<FirstPersonController>().enabled = true;
+                if (controller != null)
+                {
+                    controller.DisableMouseLook(false);
+                }
             }
         }
     }
