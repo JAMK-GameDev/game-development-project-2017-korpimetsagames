@@ -42,6 +42,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+        public bool limitDiagonalSpeed = true;
+        public bool slideWhenOverSlopeLimit = false;
+        public bool slideOnTaggedObjects = false;
+        public float slideSpeed = 12.0f;
+        public float antiBumpFactor = .75f;
+
+        private float rayDistance;
+        private float slideLimit;
+        private Vector3 contactPoint;
+
         // Use this for initialization
         private void Start()
         {
@@ -55,6 +65,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+
+            rayDistance = m_CharacterController.height * .5f + m_CharacterController.radius;
+            slideLimit = m_CharacterController.slopeLimit - .1f;
         }
 
 
@@ -108,9 +121,37 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MoveDir.x = desiredMove.x*speed;
             m_MoveDir.z = desiredMove.z*speed;
 
+            float inputModifyFactor = (m_Input.x != 0.0f && m_Input.y != 0.0f && limitDiagonalSpeed) ? .7071f : 1.0f;
 
             if (m_CharacterController.isGrounded)
             {
+                bool sliding = false;
+
+                if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, rayDistance))
+                {
+                    if (Vector3.Angle(hitInfo.normal, Vector3.up) > slideLimit)
+                        sliding = true;
+                }
+                else
+                {
+                    Physics.Raycast(hitInfo.point + Vector3.up, -Vector3.up, out hitInfo);
+                    if (Vector3.Angle(hitInfo.normal, Vector3.up) > slideLimit)
+                        sliding = true;
+                }
+
+                if ((sliding && slideWhenOverSlopeLimit) || (slideOnTaggedObjects && hitInfo.collider.tag == "Slide"))
+                {
+                    Vector3 hitNormal = hitInfo.normal;
+                    m_MoveDir = new Vector3(hitNormal.x, -hitNormal.y, hitNormal.z);
+                    Vector3.OrthoNormalize(ref hitNormal, ref m_MoveDir);
+                    m_MoveDir *= slideSpeed;
+                }
+                else
+                {
+                    m_MoveDir = new Vector3(m_Input.x * inputModifyFactor, -antiBumpFactor, m_Input.y * inputModifyFactor);
+                    m_MoveDir = transform.TransformDirection(m_MoveDir) * speed;
+                }
+
                 m_MoveDir.y = -m_StickToGroundForce;
 
                 if (m_Jump)
@@ -253,6 +294,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
+
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
         }
 
