@@ -3,19 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// Author
+// Prometheus
+
 public class MonsterBehavior : MonoBehaviour {
 
     public Transform player;
-    public float turnSpeed;
-    public float surveyTimeLimit;
-    private float surveyTimer;
+    public Terrain terrain;
+    public int totalSearches;
+    public float turnSpeed;         // kääntymisnopeus
+    public float surveyTimeLimit;   // kuinka kauan monsteri kääntyilee korkeintaan
+    private float surveyTimer;      // kuinka kauan monsteri on kääntyillyt
+    private float surveyStateChangeTimer;
+    private float surveyStateChangeTimeLimit;
     private float seed;
+    private int surveyCount;
+    private bool wasTurning;
+    private bool searchLocationsAdded;
     private bool canSeePlayer;
     private Transform monster;
     private Vector3 originalPos;
     private Vector3 lastKnownPlayerPosition;    
     private NavMeshAgent navMeshAgent;      
-    private List<Vector2> lookUpPositions;
+    private List<Vector3> lookUpPositions;
     
     public enum MonsterState
     {
@@ -29,7 +39,8 @@ public class MonsterBehavior : MonoBehaviour {
     public enum SurveyState
     {
         LookLeft,
-        LookRight
+        LookRight,
+        LookForward
     }
 
     private SurveyState surveyState;
@@ -44,24 +55,38 @@ public class MonsterBehavior : MonoBehaviour {
     void Start()
     {
         surveyTimer = 0;
+        surveyCount = 0;
+        surveyStateChangeTimer = 0;
+        surveyStateChangeTimeLimit = 1;
+        searchLocationsAdded = false;
         canSeePlayer = false;
         monster = transform;
         currentState = MonsterState.Idle;
-        surveyState = SurveyState.LookLeft;
+        surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
         originalPos = monster.position;
     }
     
     void Update()
     {
+        //print(navMeshAgent.remainingDistance);
         switch (currentState)
         {
             case MonsterState.Chase: Chase(); break;
             case MonsterState.Idle: Idle(); break;
             case MonsterState.Investigate: Investigate(); break;
             case MonsterState.Survey: Survey(); break;
+            case MonsterState.Search: Search(); break;
             default: return;
         }
+    }
+
+    public void ResetSurvey()
+    {
+        surveyStateChangeTimer = 0;
+        surveyTimer = 0;
+        surveyCount = 0;
+        searchLocationsAdded = false;
     }
 
     public void LearnPlayerPosition()
@@ -114,41 +139,97 @@ public class MonsterBehavior : MonoBehaviour {
     }
 
     private void Survey()
-    {        
-        if(surveyTimer > surveyTimeLimit)
+    {
+        /*if(lookUpPositions != null)
         {
-            surveyTimer = 0;
+            print("Surveying. Count: " + surveyCount + ". " + lookUpPositions[surveyCount]);
+        }
+        else
+        {
+            print("Surveying. Count: " + surveyCount);
+        }*/
+        
+        if(surveyCount == totalSearches)
+        {
             CurrentState = MonsterState.Idle;
+            ResetSurvey();
             return;
         }
 
-        // TODO: Logiikka jolla määritetään mihin suuntaan monsteri katselee, eli surveyState
+        if (surveyTimer > surveyTimeLimit)
+        {
+            surveyTimer = 0;
+            surveyCount++;
+            CurrentState = MonsterState.Search;
+            return;
+        }
+
+        if(surveyStateChangeTimer > surveyStateChangeTimeLimit)
+        {
+            surveyStateChangeTimeLimit = Random.Range(1, 3);
+            surveyStateChangeTimer = 0;
+            if(wasTurning)
+            {
+                surveyState = SurveyState.LookForward;
+            }
+            else
+            {
+                // randomoidaan suunta
+                seed = Random.Range(0, 100);
+                if (seed >= 50) surveyState = SurveyState.LookLeft;
+                else surveyState = SurveyState.LookRight;
+            }
+        }
 
         switch (surveyState)
         {
             case SurveyState.LookLeft:
-                //print("Looking left.");
-                // TODO: Logiikka joka kääntää monsteria
-                //monster.Rotate(Vector3.left * Time.deltaTime * turnSpeed);
+                wasTurning = true;
+                monster.Rotate(Vector3.down * Time.deltaTime * turnSpeed);
                 break;
             case SurveyState.LookRight:
-                //print("Looking right.");
+                wasTurning = true;
+                monster.Rotate(-Vector3.down * Time.deltaTime * turnSpeed);
+                break;
+            case SurveyState.LookForward:
+                wasTurning = false;
                 break;
             default: return;
         }
+
+        surveyStateChangeTimer += Time.deltaTime;
         surveyTimer += Time.deltaTime;
-        //print("Surveying.");
-        monster.GetComponent<Renderer>().material.color = Color.blue;     
+        monster.GetComponent<Renderer>().material.color = Color.cyan;
     }
 
     private void Search()
     {
-        lookUpPositions = new List<Vector2>();
-
-        for (int i = 0; i < 5; i++)
+        monster.GetComponent<Renderer>().material.color = Color.cyan;
+        
+        if(!searchLocationsAdded)
         {
-            seed = Random.Range(3, 15);
-            lookUpPositions.Add(Random.insideUnitCircle * seed);
+            lookUpPositions = new List<Vector3>();
+            Vector2 playerPosVector = new Vector2(lastKnownPlayerPosition.x, lastKnownPlayerPosition.z);
+            Vector2 searchVector;
+            Vector3 newVector;
+            float tempHeight;
+
+            for (int i = 0; i <= totalSearches; i++)
+            {               
+                seed = Random.Range(3, 10);
+                searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+                tempHeight = terrain.SampleHeight(searchVector);
+                newVector = new Vector3(searchVector.x, tempHeight, searchVector.y);
+                lookUpPositions.Add(newVector);
+            }
+            searchLocationsAdded = true;
+        }
+        
+        navMeshAgent.destination = lookUpPositions[surveyCount];
+
+        if (navMeshAgent.remainingDistance < 1.5)
+        {
+            CurrentState = MonsterState.Survey;
         }
     }
 }
