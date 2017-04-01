@@ -19,8 +19,8 @@ public class MonsterHearing : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        // jos pelaajan ja monsterin välimatka riittävän pieni
-        if (Vector3.Distance(monster.position, player.position) < HearingDistance)
+        // jos pelaajan ja monsterin välimatka riittävän pieni && monster ei valmiiksi näe pelaajaa
+        if (Vector3.Distance(monster.position, player.position) < HearingDistance && behavior.CurrentState != MonsterBehavior.MonsterState.Chase)
         {
             behavior.LearnPlayerPosition();
             behavior.CurrentState = MonsterBehavior.MonsterState.Investigate;
