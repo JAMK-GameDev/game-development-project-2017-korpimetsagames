@@ -9,14 +9,14 @@ using UnityEngine.AI;
 public class MonsterBehavior : MonoBehaviour {
 
     public Transform player;
-    public Terrain terrain;
-    public int totalSearches;
-    public float turnSpeed;         // kääntymisnopeus
+    public Terrain terrain;   
     public float surveyTimeLimit;   // kuinka kauan monsteri kääntyilee korkeintaan
+    private float turnSpeed;        // kääntymisnopeus
     private float surveyTimer;      // kuinka kauan monsteri on kääntyillyt
     private float surveyStateChangeTimer;
     private float surveyStateChangeTimeLimit;
     private float seed;
+    private int totalSearches;
     private int surveyCount;
     private bool wasTurning;
     private bool searchLocationsAdded;
@@ -54,16 +54,20 @@ public class MonsterBehavior : MonoBehaviour {
     
     void Start()
     {
+        totalSearches = Random.Range(3, 6);
         surveyTimer = 0;
         surveyCount = 0;
         surveyStateChangeTimer = 0;
         surveyStateChangeTimeLimit = 1;
+        turnSpeed = Random.Range(50, 200);
         searchLocationsAdded = false;
         canSeePlayer = false;
         monster = transform;
         currentState = MonsterState.Idle;
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.acceleration = 10;
+        navMeshAgent.angularSpeed = 999;
         originalPos = monster.position;
     }
     
@@ -81,12 +85,14 @@ public class MonsterBehavior : MonoBehaviour {
         }
     }
 
+
     public void ResetSurvey()
     {
         surveyStateChangeTimer = 0;
         surveyTimer = 0;
         surveyCount = 0;
         searchLocationsAdded = false;
+        totalSearches = Random.Range(3, 6);
     }
 
     public void LearnPlayerPosition()
@@ -163,11 +169,15 @@ public class MonsterBehavior : MonoBehaviour {
             CurrentState = MonsterState.Search;
             return;
         }
+        
 
         if(surveyStateChangeTimer > surveyStateChangeTimeLimit)
-        {
-            surveyStateChangeTimeLimit = Random.Range(1, 3);
+        {                       
+            turnSpeed = Random.Range(50, 200);
+            surveyStateChangeTimeLimit = Random.Range(50, 300) / turnSpeed;
             surveyStateChangeTimer = 0;
+            print("turnspeed: " + turnSpeed + ". timelimit: " + surveyStateChangeTimeLimit);
+
             if(wasTurning)
             {
                 surveyState = SurveyState.LookForward;
@@ -199,12 +209,12 @@ public class MonsterBehavior : MonoBehaviour {
 
         surveyStateChangeTimer += Time.deltaTime;
         surveyTimer += Time.deltaTime;
-        monster.GetComponent<Renderer>().material.color = Color.cyan;
+        //monster.GetComponent<Renderer>().material.color = Color.cyan;
     }
 
     private void Search()
     {
-        monster.GetComponent<Renderer>().material.color = Color.cyan;
+        //monster.GetComponent<Renderer>().material.color = Color.magenta;
         
         if(!searchLocationsAdded)
         {
@@ -214,9 +224,10 @@ public class MonsterBehavior : MonoBehaviour {
             Vector3 newVector;
             float tempHeight;
 
+            // randomoidaan lokaatioita xz-akseleilla ja haetaan niille oikeat korkeudet terrainista
             for (int i = 0; i <= totalSearches; i++)
             {               
-                seed = Random.Range(3, 10);
+                seed = Random.Range(5, 12);
                 searchVector = playerPosVector + (Random.insideUnitCircle * seed);
                 tempHeight = terrain.SampleHeight(searchVector);
                 newVector = new Vector3(searchVector.x, tempHeight, searchVector.y);
