@@ -34,7 +34,7 @@ public class MonsterSight : MonoBehaviour {
             behavior.SeePlayer();
             behavior.LearnPlayerPosition();
             behavior.ResetSurvey();
-            behavior.CurrentState = MonsterBehavior.MonsterState.Chase;
+            Monster.CurrentState = Monster.MonsterState.Chase;
         }
         else
         {

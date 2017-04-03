@@ -10,7 +10,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     public Transform player;
     public Terrain terrain;   
-    public float surveyTimeLimit;   // kuinka kauan monsteri kääntyilee korkeintaan
+    private float surveyTimeLimit;   // kuinka kauan monsteri kääntyilee korkeintaan
     private float turnSpeed;        // kääntymisnopeus
     private float surveyTimer;      // kuinka kauan monsteri on kääntyillyt
     private float surveyStateChangeTimer;
@@ -22,19 +22,11 @@ public class MonsterBehavior : MonoBehaviour {
     private bool searchLocationsAdded;
     private bool canSeePlayer;
     private Transform monster;
-    private Vector3 originalPos;
-    private Vector3 lastKnownPlayerPosition;    
     private NavMeshAgent navMeshAgent;      
     private List<Vector3> lookUpPositions;
     
-    public enum MonsterState
-    {
-        Chase, // näkee pelaajan ja jahtaa
-        Investigate, // ei näe pelaajaa, liikkuu sinne missä pelaaja viimeksi havaittiin        
-        Survey, // saapunut sinne missä pelaaja viimeksi havaittu, katselee ympärilleen mutta ei liiku
-        Search, // liikkuu ja tutkii lähimaastoa
-        Idle // ei merkkejä pelaajasta, palaa sijaintiin _mistä_ pelaaja nähtiin
-    }
+
+    
 
     public enum SurveyState
     {
@@ -44,17 +36,12 @@ public class MonsterBehavior : MonoBehaviour {
     }
 
     private SurveyState surveyState;
-    private MonsterState currentState;
-
-    public MonsterState CurrentState
-    {
-        get { return currentState; }
-        set { currentState = value; }
-    }
+    
     
     void Start()
     {
         totalSearches = Random.Range(3, 6);
+        surveyTimeLimit = Random.Range(4, 7);
         surveyTimer = 0;
         surveyCount = 0;
         surveyStateChangeTimer = 0;
@@ -63,24 +50,24 @@ public class MonsterBehavior : MonoBehaviour {
         searchLocationsAdded = false;
         canSeePlayer = false;
         monster = transform;
-        currentState = MonsterState.Idle;
+        Monster.CurrentState = Monster.MonsterState.Idle;
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.acceleration = 10;
         navMeshAgent.angularSpeed = 999;
-        originalPos = monster.position;
+        Monster.OriginalPos = monster.position;
     }
     
     void Update()
     {
         //print(navMeshAgent.remainingDistance);
-        switch (currentState)
+        switch (Monster.CurrentState)
         {
-            case MonsterState.Chase: Chase(); break;
-            case MonsterState.Idle: Idle(); break;
-            case MonsterState.Investigate: Investigate(); break;
-            case MonsterState.Survey: Survey(); break;
-            case MonsterState.Search: Search(); break;
+            case Monster.MonsterState.Chase: Chase(); break;
+            case Monster.MonsterState.Idle: Idle(); break;
+            case Monster.MonsterState.Investigate: Investigate(); break;
+            case Monster.MonsterState.Survey: Survey(); break;
+            case Monster.MonsterState.Search: Search(); break;
             default: return;
         }
     }
@@ -93,11 +80,12 @@ public class MonsterBehavior : MonoBehaviour {
         surveyCount = 0;
         searchLocationsAdded = false;
         totalSearches = Random.Range(3, 6);
+        surveyTimeLimit = Random.Range(4, 7);
     }
 
     public void LearnPlayerPosition()
     {
-        lastKnownPlayerPosition = player.position;
+        Monster.LastKnownPlayerPosition = player.position;
     }
 
     public void SeePlayer()
@@ -112,10 +100,10 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Chase()
     {
-        originalPos = monster.position;
+        Monster.OriginalPos = monster.position;
         if (!canSeePlayer)
         {
-            CurrentState = MonsterState.Investigate;
+            Monster.CurrentState = Monster.MonsterState.Investigate;
             return;
         }
 
@@ -128,11 +116,11 @@ public class MonsterBehavior : MonoBehaviour {
     {
         //print("Investigating. Last known position: " + lastKnownPlayerPosition + ". Distance to position: " + navMeshAgent.remainingDistance);
         monster.GetComponent<Renderer>().material.color = Color.yellow;
-        navMeshAgent.destination = lastKnownPlayerPosition;
+        navMeshAgent.destination = Monster.LastKnownPlayerPosition;
 
         if (navMeshAgent.remainingDistance < 1.5)
         {
-            CurrentState = MonsterState.Survey;
+            Monster.CurrentState = Monster.MonsterState.Survey;
             return;         
         }
     }
@@ -141,11 +129,12 @@ public class MonsterBehavior : MonoBehaviour {
     {
         //print("Idle.");
         monster.GetComponent<Renderer>().material.color = Color.green;
-        navMeshAgent.destination = originalPos;
+        navMeshAgent.destination = Monster.OriginalPos;
     }
 
     private void Survey()
     {
+        //print("Survey, " + surveyState);
         /*if(lookUpPositions != null)
         {
             print("Surveying. Count: " + surveyCount + ". " + lookUpPositions[surveyCount]);
@@ -157,26 +146,26 @@ public class MonsterBehavior : MonoBehaviour {
         
         if(surveyCount == totalSearches)
         {
-            CurrentState = MonsterState.Idle;
+            Monster.CurrentState = Monster.MonsterState.Idle;
             ResetSurvey();
             return;
         }
 
-        if (surveyTimer > surveyTimeLimit)
+        if (surveyTimer > surveyTimeLimit && wasTurning)
         {
             surveyTimer = 0;
             surveyCount++;
-            CurrentState = MonsterState.Search;
+            Monster.CurrentState = Monster.MonsterState.Search;
             return;
         }
         
+        // TODO: innostusasteet jotka määrittää kääntymisen nopeutta ja tiheyttä
 
         if(surveyStateChangeTimer > surveyStateChangeTimeLimit)
         {                       
             turnSpeed = Random.Range(50, 200);
-            surveyStateChangeTimeLimit = Random.Range(50, 300) / turnSpeed;
-            surveyStateChangeTimer = 0;
-            print("turnspeed: " + turnSpeed + ". timelimit: " + surveyStateChangeTimeLimit);
+            surveyStateChangeTimeLimit = Random.Range(200, 400) / (turnSpeed*2); // jos käännytään nopeasti, ei käännytä kauan
+            surveyStateChangeTimer = 0;            
 
             if(wasTurning)
             {
@@ -209,24 +198,25 @@ public class MonsterBehavior : MonoBehaviour {
 
         surveyStateChangeTimer += Time.deltaTime;
         surveyTimer += Time.deltaTime;
-        //monster.GetComponent<Renderer>().material.color = Color.cyan;
+        monster.GetComponent<Renderer>().material.color = Color.cyan;
     }
 
     private void Search()
     {
-        //monster.GetComponent<Renderer>().material.color = Color.magenta;
+        //print("Search, " + surveyState + ", destination: " + navMeshAgent.destination);
+        monster.GetComponent<Renderer>().material.color = Color.magenta;
         
         if(!searchLocationsAdded)
         {
             lookUpPositions = new List<Vector3>();
-            Vector2 playerPosVector = new Vector2(lastKnownPlayerPosition.x, lastKnownPlayerPosition.z);
+            Vector2 playerPosVector = new Vector2(Monster.LastKnownPlayerPosition.x, Monster.LastKnownPlayerPosition.z);
             Vector2 searchVector;
             Vector3 newVector;
             float tempHeight;
 
             // randomoidaan lokaatioita xz-akseleilla ja haetaan niille oikeat korkeudet terrainista
             for (int i = 0; i <= totalSearches; i++)
-            {               
+            {
                 seed = Random.Range(5, 12);
                 searchVector = playerPosVector + (Random.insideUnitCircle * seed);
                 tempHeight = terrain.SampleHeight(searchVector);
@@ -240,7 +230,8 @@ public class MonsterBehavior : MonoBehaviour {
 
         if (navMeshAgent.remainingDistance < 1.5)
         {
-            CurrentState = MonsterState.Survey;
+            surveyState = SurveyState.LookForward;
+            Monster.CurrentState = Monster.MonsterState.Survey;
         }
     }
 }
