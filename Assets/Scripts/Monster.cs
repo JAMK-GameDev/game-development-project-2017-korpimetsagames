@@ -21,6 +21,32 @@ public static class Monster {
         set { currentState = value; }
     }
 
+    private static float lastDetectedPlayerTimer;
+
+    public static float LastDetectedPlayerTimer
+    {
+        get { return  lastDetectedPlayerTimer; }
+        set {  lastDetectedPlayerTimer = value; }
+    }
+
+
+    private static bool canSeePlayer = false;
+
+    public static bool CanSeePlayer
+    {
+        get { return canSeePlayer; }
+        set { canSeePlayer = value; }
+    }
+
+   /* private static bool onRightTrail = false;
+
+    public static bool OnRightTrail
+    {
+        get { return onRightTrail = false; }
+        set { onRightTrail = value; }
+    }*/
+
+
     private static Vector3 originalPos;
     public static Vector3 OriginalPos
     {
@@ -32,5 +58,10 @@ public static class Monster {
     {
         get { return lastKnownPlayerPosition; }
         set { lastKnownPlayerPosition = value; }
+    }
+
+    public static void LearnPlayerPosition(Vector3 playerPosition)
+    {
+        lastKnownPlayerPosition = playerPosition;
     }
 }

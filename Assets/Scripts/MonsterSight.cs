@@ -28,17 +28,19 @@ public class MonsterSight : MonoBehaviour {
 
         // jos säde osuu johonkin && pelaaja on hirviön edessä && etäisyys pelaajaan on riittävän pieni
         if (Vector3.Angle(monster.forward, targetDir) <= MAX_ANGLE && Physics.Raycast(ray, out hit) &&             
-            hit.collider.tag.Equals("Player") &&
+            hit.collider.tag.Equals("Player") && 
             Vector3.Distance(monster.position, player.position) < SightDistance)
         {
-            behavior.SeePlayer();
-            behavior.LearnPlayerPosition();
+            Monster.CanSeePlayer = true;
+            //Monster.OnRightTrail = true;
+            Monster.LastDetectedPlayerTimer = 0;
+            Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();
             Monster.CurrentState = Monster.MonsterState.Chase;
         }
         else
         {
-            behavior.LosePlayer();
+            Monster.CanSeePlayer = false;
         }
     }
 }

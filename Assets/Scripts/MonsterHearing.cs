@@ -22,8 +22,10 @@ public class MonsterHearing : MonoBehaviour {
         // jos pelaajan ja monsterin välimatka riittävän pieni && monster ei valmiiksi näe pelaajaa
         if (Vector3.Distance(monster.position, player.position) < HearingDistance && Monster.CurrentState != Monster.MonsterState.Chase)
         {            
-            behavior.LearnPlayerPosition();
+            Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();
+            //Monster.OnRightTrail = true;
+            Monster.LastDetectedPlayerTimer = 0;
             Monster.CurrentState = Monster.MonsterState.Investigate;
         }
     }

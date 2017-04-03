@@ -4,40 +4,59 @@ using UnityEngine;
 
 public class MonsterMacroBehavior : MonoBehaviour {
 
-
-    private float lastSeenPlayerTimer;
-    public float TimeLimit;
-    public Transform player;
     public Terrain terrain;
-    int seed;
+    public int waterLevel;
+    public float tipDelay;
+
+    private MonsterBehavior monsterBehavior;      
+    private int seed;
+
 	// Use this for initialization
 	void Start ()
     {
         seed = 0;
-        lastSeenPlayerTimer = 0;        
-	}
+        Monster.LastDetectedPlayerTimer = 0;
+        monsterBehavior = GetComponent<MonsterBehavior>();
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        lastSeenPlayerTimer += Time.deltaTime;
-        if(lastSeenPlayerTimer > TimeLimit)
-        {            
-            Vector2 playerPosVector = new Vector2(player.position.x, player.position.z);
-            Vector2 searchVector;
-            Vector3 newVector;
-            float tempHeight;
+        Monster.LastDetectedPlayerTimer += Time.deltaTime;
+        if(Monster.LastDetectedPlayerTimer > tipDelay && (Monster.CurrentState == Monster.MonsterState.Idle || Monster.CurrentState == Monster.MonsterState.Survey) || Input.GetKey(KeyCode.O))
+        {
+            TipMonster();
+            Monster.LastDetectedPlayerTimer = 0;
+        }
+    }
 
-            // randomoidaan lokaatioita xz-akseleilla ja haetaan niille oikeat korkeudet terrainista
+    public void TipMonster()
+    {
+        monsterBehavior.ResetSurvey();
+        Vector3 newVector = BuildPointOfInterest(10,15);        
+        //Monster.OnRightTrail = false;
+        Monster.LastKnownPlayerPosition = newVector;
+        Monster.OriginalPos = newVector;
+        Monster.CurrentState = Monster.MonsterState.Investigate;        
+    }
 
-            seed = Random.Range(8, 40);
+    public Vector3 BuildPointOfInterest(int minDistance, int maxDistance)
+    {
+        Vector2 playerPosVector = new Vector2(Monster.LastKnownPlayerPosition.x, Monster.LastKnownPlayerPosition.z);
+        Vector2 searchVector;
+        Vector3 result;
+        float tempHeight;
+
+        seed = Random.Range(minDistance, maxDistance);
+        searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+        tempHeight = terrain.SampleHeight(searchVector);    
+        while(tempHeight < waterLevel)
+        {
+            seed = Random.Range(minDistance, maxDistance);
             searchVector = playerPosVector + (Random.insideUnitCircle * seed);
             tempHeight = terrain.SampleHeight(searchVector);
-            newVector = new Vector3(searchVector.x, tempHeight, searchVector.y);
-            Monster.LastKnownPlayerPosition = newVector;
-            Monster.OriginalPos = newVector;
-            Monster.CurrentState = Monster.MonsterState.Investigate;
-            lastSeenPlayerTimer = 0;
         }
-	}
+        result = new Vector3(searchVector.x, tempHeight, searchVector.y);
+        return result;
+    }
 }
