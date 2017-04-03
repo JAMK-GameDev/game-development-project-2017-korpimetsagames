@@ -4,28 +4,29 @@ using UnityEngine;
 
 public class Flashlight : MonoBehaviour {
 
-    Light flight;
+    Light flashlight;
     public AudioClip soundOn;
     public AudioClip soundOff;
+    public Inventory inventory;
 
     void Start ()
     {
-        flight = GetComponent<Light>();
-        flight.enabled = false;
+        flashlight = GetComponent<Light>();
+        flashlight.enabled = false;
     }
 
 	void Update ()
     {
-		if (Input.GetKeyDown(KeyCode.F))
+		if (inventory.hasFlashlight && Input.GetKeyDown(KeyCode.F))
         {
-            if (!flight.enabled)
+            if (!flashlight.enabled)
             {
-                flight.enabled = true;
+                flashlight.enabled = true;
                 // TODO: Play sound
             }
             else
             {
-                flight.enabled = false;
+                flashlight.enabled = false;
                 // TODO: Play sound
             }
         }
