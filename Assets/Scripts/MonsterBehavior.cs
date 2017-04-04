@@ -21,6 +21,7 @@ public class MonsterBehavior : MonoBehaviour {
     private int surveyCount;
     private bool wasTurning;
     private bool searchLocationsAdded;
+    private Transform body;
     private Transform monster;
     private NavMeshAgent navMeshAgent;      
     private List<Vector3> pointsOfInterest;
@@ -55,10 +56,12 @@ public class MonsterBehavior : MonoBehaviour {
         Monster.OriginalPos = monster.position;
         Monster.LastKnownPlayerPosition = player.position;
         macroBehavior = GetComponent<MonsterMacroBehavior>();
+        body = monster.FindChild("Body");
     }
     
     void Update()
-    {        
+    {
+        print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition);
         switch (Monster.CurrentState)
         {
             case Monster.MonsterState.Chase: Chase(); break;
@@ -91,15 +94,15 @@ public class MonsterBehavior : MonoBehaviour {
             Monster.CurrentState = Monster.MonsterState.Investigate;
             return;
         }
-        
-        monster.GetComponent<Renderer>().material.color = Color.red;
+
+        body.GetComponent<Renderer>().material.color = Color.red;
         navMeshAgent.destination = player.position;
     }
 
     private void Investigate()
     {
         // välillä monsteri jää investigateen jumiin, kun sille annettuun sijaintiin ei saa laskettua reittiä
-        monster.GetComponent<Renderer>().material.color = Color.yellow;
+        body.GetComponent<Renderer>().material.color = Color.yellow;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;
         //print(monster.position + " | " + navMeshAgent.destination +". Stopping distance: " + navMeshAgent.stoppingDistance + ", remaining distance: " + navMeshAgent.remainingDistance + ", pathpending: " + navMeshAgent.pathPending + ", hasPath: " + navMeshAgent.hasPath + ", velocity: " + navMeshAgent.velocity.sqrMagnitude);
         if (PathComplete())
@@ -134,11 +137,12 @@ public class MonsterBehavior : MonoBehaviour {
             ResetSurvey();
             return;
         }
-        
-       /* if(pointsOfInterest!= null)
-        {
-            print("Endpoint: " +pointsOfInterest[surveyCount] + ", monster pos: " + monster.position);
-        }*/
+
+
+        /* if(pointsOfInterest!= null)
+         {
+             print("Endpoint: " +pointsOfInterest[surveyCount] + ", monster pos: " + monster.position);
+         }*/
 
         // jos on katseltu ympäriinsä tässä pisteessä riittävän kauan 
         // wasturning siksi ettei monsteri sinkoa muualle kesken kääntymisen (kuuluu olla true)
@@ -189,12 +193,12 @@ public class MonsterBehavior : MonoBehaviour {
 
         surveyStateChangeTimer += Time.deltaTime;
         surveyTimer += Time.deltaTime;
-        monster.GetComponent<Renderer>().material.color = Color.cyan;
+        body.GetComponent<Renderer>().material.color = Color.cyan;
     }
 
     private void Search()
     {
-        monster.GetComponent<Renderer>().material.color = Color.magenta;
+        body.GetComponent<Renderer>().material.color = Color.magenta;
         
         if(!searchLocationsAdded)
         {
@@ -225,7 +229,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Idle()
     {
-        monster.GetComponent<Renderer>().material.color = Color.green;
+        body.GetComponent<Renderer>().material.color = Color.green;
         navMeshAgent.destination = Monster.OriginalPos;
     }
 
