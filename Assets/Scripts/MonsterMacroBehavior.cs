@@ -33,11 +33,31 @@ public class MonsterMacroBehavior : MonoBehaviour {
     public void TipMonster()
     {
         monsterBehavior.ResetSurvey();
-        Vector3 newVector = BuildPointOfInterest(10,15);        
+        Vector3 newVector = BuildPointOfInterestNearPlayer(10,15);        
         //Monster.OnRightTrail = false;
         Monster.LastKnownPlayerPosition = newVector;
         Monster.OriginalPos = newVector;
         Monster.CurrentState = Monster.MonsterState.Investigate;        
+    }
+
+    public Vector3 BuildPointOfInterestNearPlayer(int minDistance, int maxDistance)
+    {
+        Vector2 playerPosVector = new Vector2(monsterBehavior.player.position.x, monsterBehavior.player.position.z);
+        Vector2 searchVector;
+        Vector3 result;
+        float tempHeight;
+
+        seed = Random.Range(minDistance, maxDistance);
+        searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+        tempHeight = terrain.SampleHeight(searchVector);    
+        while(tempHeight < waterLevel)
+        {
+            seed = Random.Range(minDistance, maxDistance);
+            searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+            tempHeight = terrain.SampleHeight(searchVector);
+        }
+        result = new Vector3(searchVector.x, tempHeight, searchVector.y);
+        return result;
     }
 
     public Vector3 BuildPointOfInterest(int minDistance, int maxDistance)
@@ -49,8 +69,8 @@ public class MonsterMacroBehavior : MonoBehaviour {
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-        tempHeight = terrain.SampleHeight(searchVector);    
-        while(tempHeight < waterLevel)
+        tempHeight = terrain.SampleHeight(searchVector);
+        while (tempHeight < waterLevel)
         {
             seed = Random.Range(minDistance, maxDistance);
             searchVector = playerPosVector + (Random.insideUnitCircle * seed);

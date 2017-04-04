@@ -17,7 +17,7 @@ public class MonsterSight : MonoBehaviour {
     {
         player = GetComponent<MonsterHead>().player;
         monster = transform;
-        behavior = monster.parent.GetComponent<MonsterBehavior>();
+        behavior = monster.parent.parent.GetComponent<MonsterBehavior>();
     }
 	
 	// Update is called once per frame
