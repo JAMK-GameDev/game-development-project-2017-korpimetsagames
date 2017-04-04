@@ -7,295 +7,187 @@ using Random = UnityEngine.Random;
 namespace UnityStandardAssets.Characters.FirstPerson
 {
     [RequireComponent(typeof (CharacterController))]
-    [RequireComponent(typeof (AudioSource))]
     public class FirstPersonController : MonoBehaviour
     {
-        [SerializeField] private bool m_IsWalking;
-        [SerializeField] private float m_WalkSpeed;
-        [SerializeField] private float m_RunSpeed;
-        [SerializeField] [Range(0f, 1f)] private float m_RunstepLenghten;
-        [SerializeField] private float m_JumpSpeed;
-        [SerializeField] private float m_StickToGroundForce;
-        [SerializeField] private float m_GravityMultiplier;
-        [SerializeField] private MouseLook m_MouseLook;
-        [SerializeField] private bool m_UseFovKick;
-        [SerializeField] private FOVKick m_FovKick = new FOVKick();
-        [SerializeField] private bool m_UseHeadBob;
-        [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
-        [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
-        [SerializeField] private float m_StepInterval;
-        [SerializeField] private AudioClip[] m_FootstepSounds;    // an array of footstep sounds that will be randomly selected from.
-        [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
-        [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
+        public float walkSpeed = 6.0f;
 
-        private Camera m_Camera;
-        private bool m_Jump;
-        private float m_YRotation;
-        private Vector2 m_Input;
-        private Vector3 m_MoveDir = Vector3.zero;
-        private CharacterController m_CharacterController;
-        private CollisionFlags m_CollisionFlags;
-        private bool m_PreviouslyGrounded;
-        private Vector3 m_OriginalCameraPosition;
-        private float m_StepCycle;
-        private float m_NextStep;
-        private bool m_Jumping;
-        private AudioSource m_AudioSource;
+        public float runSpeed = 11.0f;
 
+        // If true, diagonal speed (when strafing + moving forward or back) can't exceed normal move speed; otherwise it's about 1.4 times faster
         public bool limitDiagonalSpeed = true;
+
+        // If checked, the run key toggles between running and walking. Otherwise player runs if the key is held down and walks otherwise
+        // There must be a button set up in the Input Manager called "Run"
+        public bool toggleRun = false;
+
+        public float jumpSpeed = 8.0f;
+        public float gravity = 20.0f;
+
+        // Units that player can fall before a falling damage function is run. To disable, type "infinity" in the inspector
+        public float fallingDamageThreshold = 10.0f;
+
+        // If the player ends up on a slope which is at least the Slope Limit as set on the character controller, then he will slide down
         public bool slideWhenOverSlopeLimit = false;
+
+        // If checked and the player is on an object tagged "Slide", he will slide down it regardless of the slope limit
         public bool slideOnTaggedObjects = false;
+
         public float slideSpeed = 12.0f;
+
+        // If checked, then the player can change direction while in the air
+        public bool airControl = false;
+
+        // Small amounts of this results in bumping when walking down slopes, but large amounts results in falling too fast
         public float antiBumpFactor = .75f;
 
-        private float rayDistance;
+        // Player must be grounded for at least this many physics frames before being able to jump again; set to 0 to allow bunny hopping
+        public int antiBunnyHopFactor = 1;
+
+        private Vector3 moveDirection = Vector3.zero;
+        private bool grounded = false;
+        private CharacterController controller;
+        private Transform myTransform;
+        private float speed;
+        private RaycastHit hit;
+        private float fallStartLevel;
+        private bool falling;
         private float slideLimit;
+        private float rayDistance;
         private Vector3 contactPoint;
+        private bool playerControl = false;
+        private int jumpTimer;
+
+        [SerializeField] private MouseLook m_MouseLook;
+        private Camera m_Camera;
 
         // Use this for initialization
-        private void Start()
+        void Start()
         {
-            m_CharacterController = GetComponent<CharacterController>();
+            controller = GetComponent<CharacterController>();
+            myTransform = transform;
+            speed = walkSpeed;
+            rayDistance = controller.height * .5f + controller.radius;
+            slideLimit = controller.slopeLimit - .1f;
+            jumpTimer = antiBunnyHopFactor;
+
             m_Camera = Camera.main;
-            m_OriginalCameraPosition = m_Camera.transform.localPosition;
-            m_FovKick.Setup(m_Camera);
-            m_HeadBob.Setup(m_Camera, m_StepInterval);
-            m_StepCycle = 0f;
-            m_NextStep = m_StepCycle/2f;
-            m_Jumping = false;
-            m_AudioSource = GetComponent<AudioSource>();
-			m_MouseLook.Init(transform , m_Camera.transform);
-
-            rayDistance = m_CharacterController.height * .5f + m_CharacterController.radius;
-            slideLimit = m_CharacterController.slopeLimit - .1f;
+			m_MouseLook.Init(transform, m_Camera.transform);
         }
 
-
-        // Update is called once per frame
-        private void Update()
+        void FixedUpdate()
         {
-            RotateView();
-            // the jump state needs to read here to make sure it is not missed
-            if (!m_Jump && m_CharacterController.isGrounded)
-            {
-                m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
-            }
+            float inputX = Input.GetAxis("Horizontal");
+            float inputY = Input.GetAxis("Vertical");
+            // If both horizontal and vertical are used simultaneously, limit speed (if allowed), so the total doesn't exceed normal move speed
+            float inputModifyFactor = (inputX != 0.0f && inputY != 0.0f && limitDiagonalSpeed) ? .7071f : 1.0f;
 
-            if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
-            {
-                StartCoroutine(m_JumpBob.DoBobCycle());
-                PlayLandingSound();
-                m_MoveDir.y = 0f;
-                m_Jumping = false;
-            }
-            if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
-            {
-                m_MoveDir.y = 0f;
-            }
-
-            m_PreviouslyGrounded = m_CharacterController.isGrounded;
-        }
-
-
-        private void PlayLandingSound()
-        {
-            m_AudioSource.clip = m_LandSound;
-            m_AudioSource.Play();
-            m_NextStep = m_StepCycle + .5f;
-        }
-
-
-        private void FixedUpdate()
-        {
-            float speed;
-            GetInput(out speed);
-            // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
-
-            // get a normal for the surface that is being touched to move along it
-            RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
-
-            m_MoveDir.x = desiredMove.x*speed;
-            m_MoveDir.z = desiredMove.z*speed;
-
-            float inputModifyFactor = (m_Input.x != 0.0f && m_Input.y != 0.0f && limitDiagonalSpeed) ? .7071f : 1.0f;
-
-            if (m_CharacterController.isGrounded)
+            if (grounded)
             {
                 bool sliding = false;
-
-                if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, rayDistance))
+                // See if surface immediately below should be slid down. We use this normally rather than a ControllerColliderHit point,
+                // because that interferes with step climbing amongst other annoyances
+                if (Physics.Raycast(myTransform.position, -Vector3.up, out hit, rayDistance))
                 {
-                    if (Vector3.Angle(hitInfo.normal, Vector3.up) > slideLimit)
+                    if (Vector3.Angle(hit.normal, Vector3.up) > slideLimit)
                         sliding = true;
                 }
+                // However, just raycasting straight down from the center can fail when on steep slopes
+                // So if the above raycast didn't catch anything, raycast down from the stored ControllerColliderHit point instead
                 else
                 {
-                    Physics.Raycast(hitInfo.point + Vector3.up, -Vector3.up, out hitInfo);
-                    if (Vector3.Angle(hitInfo.normal, Vector3.up) > slideLimit)
+                    Physics.Raycast(contactPoint + Vector3.up, -Vector3.up, out hit);
+                    if (Vector3.Angle(hit.normal, Vector3.up) > slideLimit)
                         sliding = true;
                 }
 
-                if ((sliding && slideWhenOverSlopeLimit) || (slideOnTaggedObjects && hitInfo.collider.tag == "Slide"))
+                // If we were falling, and we fell a vertical distance greater than the threshold, run a falling damage routine
+                if (falling)
                 {
-                    Vector3 hitNormal = hitInfo.normal;
-                    m_MoveDir = new Vector3(hitNormal.x, -hitNormal.y, hitNormal.z);
-                    Vector3.OrthoNormalize(ref hitNormal, ref m_MoveDir);
-                    m_MoveDir *= slideSpeed;
+                    falling = false;
+                    if (myTransform.position.y < fallStartLevel - fallingDamageThreshold)
+                        FallingDamageAlert(fallStartLevel - myTransform.position.y);
                 }
+
+                // If running isn't on a toggle, then use the appropriate speed depending on whether the run button is down
+                if (!toggleRun)
+                    speed = Input.GetButton("Run") ? runSpeed : walkSpeed;
+
+                // If sliding (and it's allowed), or if we're on an object tagged "Slide", get a vector pointing down the slope we're on
+                if ((sliding && slideWhenOverSlopeLimit) || (slideOnTaggedObjects && hit.collider.tag == "Slide"))
+                {
+                    Vector3 hitNormal = hit.normal;
+                    moveDirection = new Vector3(hitNormal.x, -hitNormal.y, hitNormal.z);
+                    Vector3.OrthoNormalize(ref hitNormal, ref moveDirection);
+                    moveDirection *= slideSpeed;
+                    playerControl = false;
+                }
+                // Otherwise recalculate moveDirection directly from axes, adding a bit of -y to avoid bumping down inclines
                 else
                 {
-                    m_MoveDir = new Vector3(m_Input.x * inputModifyFactor, -antiBumpFactor, m_Input.y * inputModifyFactor);
-                    m_MoveDir = transform.TransformDirection(m_MoveDir) * speed;
+                    moveDirection = new Vector3(inputX * inputModifyFactor, -antiBumpFactor, inputY * inputModifyFactor);
+                    moveDirection = myTransform.TransformDirection(moveDirection) * speed;
+                    playerControl = true;
                 }
 
-                m_MoveDir.y = -m_StickToGroundForce;
-
-                if (m_Jump)
+                // Jump! But only if the jump button has been released and player has been grounded for a given number of frames
+                if (!Input.GetButton("Jump"))
+                    jumpTimer++;
+                else if (jumpTimer >= antiBunnyHopFactor)
                 {
-                    m_MoveDir.y = m_JumpSpeed;
-                    PlayJumpSound();
-                    m_Jump = false;
-                    m_Jumping = true;
+                    moveDirection.y = jumpSpeed;
+                    jumpTimer = 0;
                 }
             }
             else
             {
-                m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
+                // If we stepped over a cliff or something, set the height at which we started falling
+                if (!falling)
+                {
+                    falling = true;
+                    fallStartLevel = myTransform.position.y;
+                }
+
+                // If air control is allowed, check movement but don't touch the y component
+                if (airControl && playerControl)
+                {
+                    moveDirection.x = inputX * speed * inputModifyFactor;
+                    moveDirection.z = inputY * speed * inputModifyFactor;
+                    moveDirection = myTransform.TransformDirection(moveDirection);
+                }
             }
-            m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
 
-            ProgressStepCycle(speed);
-            UpdateCameraPosition(speed);
+            // Apply gravity
+            moveDirection.y -= gravity * Time.deltaTime;
 
-            m_MouseLook.UpdateCursorLock();
+            // Move the controller, and set grounded true or false depending on whether we're standing on something
+            grounded = (controller.Move(moveDirection * Time.deltaTime) & CollisionFlags.Below) != 0;
         }
 
-
-        private void PlayJumpSound()
+        void Update()
         {
-            m_AudioSource.clip = m_JumpSound;
-            m_AudioSource.Play();
+            RotateView();
+            // If the run button is set to toggle, then switch between walk/run speed. (We use Update for this...
+            // FixedUpdate is a poor place to use GetButtonDown, since it doesn't necessarily run every frame and can miss the event)
+            if (toggleRun && grounded && Input.GetButtonDown("Run"))
+                speed = (speed == walkSpeed ? runSpeed : walkSpeed);
         }
 
-
-        private void ProgressStepCycle(float speed)
+        // Store point that we're in contact with for use in FixedUpdate if needed
+        void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (m_CharacterController.velocity.sqrMagnitude > 0 && (m_Input.x != 0 || m_Input.y != 0))
-            {
-                m_StepCycle += (m_CharacterController.velocity.magnitude + (speed*(m_IsWalking ? 1f : m_RunstepLenghten)))*
-                             Time.fixedDeltaTime;
-            }
-
-            if (!(m_StepCycle > m_NextStep))
-            {
-                return;
-            }
-
-            m_NextStep = m_StepCycle + m_StepInterval;
-
-            PlayFootStepAudio();
+            contactPoint = hit.point;
         }
 
-
-        private void PlayFootStepAudio()
+        // If falling damage occured, this is the place to do something about it. You can make the player
+        // have hitpoints and remove some of them based on the distance fallen, add sound effects, etc.
+        void FallingDamageAlert(float fallDistance)
         {
-            if (!m_CharacterController.isGrounded)
-            {
-                return;
-            }
-            // pick & play a random footstep sound from the array,
-            // excluding sound at index 0
-            int n = Random.Range(1, m_FootstepSounds.Length);
-            m_AudioSource.clip = m_FootstepSounds[n];
-            m_AudioSource.PlayOneShot(m_AudioSource.clip);
-            // move picked sound to index 0 so it's not picked next time
-            m_FootstepSounds[n] = m_FootstepSounds[0];
-            m_FootstepSounds[0] = m_AudioSource.clip;
+            print("Ouch! Fell " + fallDistance + " units!");
         }
-
-
-        private void UpdateCameraPosition(float speed)
-        {
-            Vector3 newCameraPosition;
-            if (!m_UseHeadBob)
-            {
-                return;
-            }
-            if (m_CharacterController.velocity.magnitude > 0 && m_CharacterController.isGrounded)
-            {
-                m_Camera.transform.localPosition =
-                    m_HeadBob.DoHeadBob(m_CharacterController.velocity.magnitude +
-                                      (speed*(m_IsWalking ? 1f : m_RunstepLenghten)));
-                newCameraPosition = m_Camera.transform.localPosition;
-                newCameraPosition.y = m_Camera.transform.localPosition.y - m_JumpBob.Offset();
-            }
-            else
-            {
-                newCameraPosition = m_Camera.transform.localPosition;
-                newCameraPosition.y = m_OriginalCameraPosition.y - m_JumpBob.Offset();
-            }
-            m_Camera.transform.localPosition = newCameraPosition;
-        }
-
-
-        private void GetInput(out float speed)
-        {
-            // Read input
-            float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
-            float vertical = CrossPlatformInputManager.GetAxis("Vertical");
-
-            bool waswalking = m_IsWalking;
-
-#if !MOBILE_INPUT
-            // On standalone builds, walk/run speed is modified by a key press.
-            // keep track of whether or not the character is walking or running
-            m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
-#endif
-            // set the desired speed to be walking or running
-            speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
-            m_Input = new Vector2(horizontal, vertical);
-
-            // normalize input if it exceeds 1 in combined length:
-            if (m_Input.sqrMagnitude > 1)
-            {
-                m_Input.Normalize();
-            }
-
-            // handle speed change to give an fov kick
-            // only if the player is going to a run, is running and the fovkick is to be used
-            if (m_IsWalking != waswalking && m_UseFovKick && m_CharacterController.velocity.sqrMagnitude > 0)
-            {
-                StopAllCoroutines();
-                StartCoroutine(!m_IsWalking ? m_FovKick.FOVKickUp() : m_FovKick.FOVKickDown());
-            }
-        }
-
 
         private void RotateView()
         {
-            m_MouseLook.LookRotation (transform, m_Camera.transform);
-        }
-
-
-        private void OnControllerColliderHit(ControllerColliderHit hit)
-        {
-            Rigidbody body = hit.collider.attachedRigidbody;
-            //dont move the rigidbody if the character is on top of it
-            if (m_CollisionFlags == CollisionFlags.Below)
-            {
-                return;
-            }
-
-            if (body == null || body.isKinematic)
-            {
-                return;
-            }
-
-            body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+            m_MouseLook.LookRotation(transform, m_Camera.transform);
         }
 
         public void DisableMouseLook(bool disable)

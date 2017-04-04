@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 
 public class PickUp : MonoBehaviour
 {
+    public UIManager uiManager;
     bool inZone = false;
-
+    
     void Update()
     {
         Collect();
@@ -24,7 +24,7 @@ public class PickUp : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            GameObject.Find("PickUpText").GetComponent<Text>().text = "E to pick up";
+            uiManager.ShowInfo("E to pick up");
             inZone = true;
         }
     }
@@ -33,7 +33,7 @@ public class PickUp : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            GameObject.Find("PickUpText").GetComponent<Text>().text = "";
+            uiManager.HideInfo();
             inZone = false;
         }
     }
@@ -41,7 +41,7 @@ public class PickUp : MonoBehaviour
     void DisableText()
     {
         GetComponent<Collider>().enabled = false;
-        GameObject.Find("PickUpText").GetComponent<Text>().text = "";
+        uiManager.HideInfo();
         inZone = false;
     }
 

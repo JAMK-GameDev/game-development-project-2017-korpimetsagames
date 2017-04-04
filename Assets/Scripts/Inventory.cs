@@ -17,6 +17,7 @@ public class Inventory : MonoBehaviour {
     GameObject equippedItem = null;
     Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
     public bool hasFlashlight { get; private set; }
+    public bool hasKey { get; private set; }
 
     void Start()
     {
@@ -47,6 +48,7 @@ public class Inventory : MonoBehaviour {
         items.Add(item);
         AddinventoryUIButton(item);
         if (item.name == "Flashlight") { hasFlashlight = true; }
+        if (item.name == "Key") { hasKey = true; }
         if (equippedItem == null && item.GetComponent<ItemData>().canEquip)
         {
             EquipItem(item);

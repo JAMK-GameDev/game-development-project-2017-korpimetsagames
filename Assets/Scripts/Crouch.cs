@@ -7,7 +7,7 @@ namespace FPSSystem
     {
         public float crouchSpeed = 3;
         CharacterController charController;
-        public Transform Player;
+        Transform Player;
         private float charHeight;
         private Vector3 pos;
 
