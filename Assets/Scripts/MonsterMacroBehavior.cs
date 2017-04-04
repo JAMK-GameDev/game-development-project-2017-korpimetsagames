@@ -23,7 +23,7 @@ public class MonsterMacroBehavior : MonoBehaviour {
 	void Update ()
     {
         Monster.LastDetectedPlayerTimer += Time.deltaTime;
-        if(Monster.LastDetectedPlayerTimer > tipDelay && (Monster.CurrentState == Monster.MonsterState.Idle || Monster.CurrentState == Monster.MonsterState.Survey) || Input.GetKey(KeyCode.O))
+        if(Monster.LastDetectedPlayerTimer > tipDelay && Monster.CurrentState == Monster.MonsterState.Idle || Input.GetKey(KeyCode.O))
         {
             TipMonster();
             Monster.LastDetectedPlayerTimer = 0;

@@ -12,8 +12,8 @@ public class MonsterHearing : MonoBehaviour {
 	void Start ()
     {
         monster = transform;
-        behavior = monster.GetComponent<MonsterBehavior>();
-        player = GetComponent<MonsterBehavior>().player;        
+        behavior = monster.parent.GetComponent<MonsterBehavior>();
+        player = GetComponent<MonsterHead>().player;        
 	}
 	
 	// Update is called once per frame

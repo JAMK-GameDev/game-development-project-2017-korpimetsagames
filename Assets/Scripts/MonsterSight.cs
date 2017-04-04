@@ -15,9 +15,9 @@ public class MonsterSight : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        player = GetComponent<MonsterBehavior>().player;
+        player = GetComponent<MonsterHead>().player;
         monster = transform;
-        behavior = monster.GetComponent<MonsterBehavior>();
+        behavior = monster.parent.GetComponent<MonsterBehavior>();
     }
 	
 	// Update is called once per frame
