@@ -2,24 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Player {
-
-	public enum State
+public static class Player
+{
+	public enum PsycheState
     {
         Carefree = 1,
         Stressed = 2,
         Panic = 4,
         Paralyzed = 6,
-        Screaming = 10           
+        Berserk = 10           
     }
 
-    private static State currentState;
+    private static PsycheState psyche;
 
-    public static State CurrentState
+    public static PsycheState Psyche
     {
-        get { return currentState; }
-        set { currentState = value; }
+        get { return psyche; }
+        set { psyche = value; }
     }
+
+    public enum MoveState
+    {
+        Walk,
+        Sneak,
+        Run
+    }
+
+    private static MoveState moveMode;
+
+    public static MoveState MoveMode
+    {
+        get { return moveMode; }
+        set { moveMode = value; }
+    }
+
+    public static float NoiseLevel
+    {
+        get
+        {
+            float moveModeMultiplier;
+            switch(moveMode)
+            {
+                case MoveState.Sneak:
+                    moveModeMultiplier = (float)0.5;
+                    break;
+                case MoveState.Walk:
+                    moveModeMultiplier = 1;
+                    break;                
+                case MoveState.Run:
+                    moveModeMultiplier = 2;
+                    break;
+                default:
+                    throw new System.Exception("Noise level defaulted.");
+            }
+
+            return moveModeMultiplier * (int)psyche;
+        }
+    }
+
 
     private static float fearLevel;
 
@@ -31,43 +71,44 @@ public static class Player {
 
     public static void ImproveState()
     {
-        switch(currentState)
+        switch(psyche)
         {
-            case State.Carefree:
+            case PsycheState.Carefree:
                 break;
-            case State.Stressed:
-                currentState = State.Carefree;
+            case PsycheState.Stressed:
+                psyche = PsycheState.Carefree;
                 break;
-            case State.Panic:
-                currentState = State.Stressed;
+            case PsycheState.Panic:
+                psyche = PsycheState.Stressed;
                 break;
-            case State.Paralyzed:
-                currentState = State.Panic;
+            case PsycheState.Paralyzed:
+                psyche = PsycheState.Panic;
                 break;
-            case State.Screaming:
-                currentState = State.Paralyzed;
+            case PsycheState.Berserk:
+                psyche = PsycheState.Paralyzed;
                 break;
         }
     }
 
     public static void WorsenState()
     {
-        switch (currentState)
+        switch (psyche)
         {
-            case State.Carefree:
-                currentState = State.Stressed;
+            case PsycheState.Carefree:
+                psyche = PsycheState.Stressed;
                 break;
-            case State.Stressed:
-                currentState = State.Panic;
+            case PsycheState.Stressed:
+                psyche = PsycheState.Panic;
                 break;
-            case State.Panic:
-                currentState = State.Paralyzed;
+            case PsycheState.Panic:
+                psyche = PsycheState.Paralyzed;
                 break;
-            case State.Paralyzed:
-                currentState = State.Screaming;
+            case PsycheState.Paralyzed:
+                psyche = PsycheState.Berserk;
                 break;
-            case State.Screaming:
+            case PsycheState.Berserk:
                 break;
         }
     }
 }
+

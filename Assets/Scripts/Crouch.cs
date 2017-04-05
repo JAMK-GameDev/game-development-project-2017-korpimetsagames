@@ -7,13 +7,13 @@ namespace FPSSystem
     {
         public float crouchSpeed = 3;
         CharacterController charController;
-        Transform Player;
+        Transform player;
         private float charHeight;
         private Vector3 pos;
 
         void Start()
         {
-            Player = transform;
+            player = transform;
             charController = GetComponent<CharacterController>();
             charHeight = charController.height;
         }
@@ -25,13 +25,18 @@ namespace FPSSystem
             if (Input.GetKey(KeyCode.LeftControl))
             {
                 h = 1;
+                Player.MoveMode = Player.MoveState.Sneak;
+            }
+            else
+            {
+                Player.MoveMode = Player.MoveState.Walk;
             }
             float lastHeight = charController.height;
             charController.height = Mathf.Lerp(charController.height, h, Time.deltaTime * 5);
-            pos.x = Player.position.x;
-            pos.z = Player.position.z;
-            pos.y = Player.position.y + (charController.height - lastHeight) / 2;
-            Player.position = pos;
+            pos.x = player.position.x;
+            pos.z = player.position.z;
+            pos.y = player.position.y + (charController.height - lastHeight) / 2;
+            player.position = pos;
         }
     }
 }

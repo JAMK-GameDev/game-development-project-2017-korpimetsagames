@@ -19,7 +19,8 @@ public class PlayerBehavior : MonoBehaviour {
     // Use this for initialization
     void Start () {
         Player.FearLevel = 0;
-        Player.CurrentState = Player.State.Carefree;
+        Player.Psyche = Player.PsycheState.Carefree;
+        Player.MoveMode = Player.MoveState.Walk;
         controller = GameObject.FindObjectOfType<FirstPersonController>();
         player = transform;
         walkSpeed = controller.walkSpeed;
@@ -56,29 +57,29 @@ public class PlayerBehavior : MonoBehaviour {
     private void UpdatePlayerState()
     {
         // jos täytyy siirtyä pelokkaampaan tasoon
-        if (Player.FearLevel > 100 && Player.CurrentState != Player.State.Screaming)
+        if (Player.FearLevel > 100 && Player.Psyche != Player.PsycheState.Berserk)
         {
             Player.WorsenState();
             Player.FearLevel = Player.FearLevel % 100;
         }
         // jos täytyy siirtyä huolettomampaan tasoon
-        else if (Player.FearLevel < 0 && Player.CurrentState != Player.State.Carefree)
+        else if (Player.FearLevel < 0 && Player.Psyche != Player.PsycheState.Carefree)
         {
             Player.ImproveState();
             Player.FearLevel = 99;
         }
         // jos maksimi peloissaan, ei nosteta enempää pelkoa
-        else if (Player.FearLevel > 100 && Player.CurrentState == Player.State.Screaming)
+        else if (Player.FearLevel > 100 && Player.Psyche == Player.PsycheState.Berserk)
         {
             Player.FearLevel = 99;
         }
         // jos pelaaja on huoleton, ei lasketa enempää pelkoa
-        else if (Player.FearLevel < 0 && Player.CurrentState == Player.State.Carefree)
+        else if (Player.FearLevel < 0 && Player.Psyche == Player.PsycheState.Carefree)
         {
             Player.FearLevel = 1;
         }
 
-        if((int)Player.CurrentState >= (int)Player.State.Paralyzed)
+        if((int)Player.Psyche >= (int)Player.PsycheState.Paralyzed)
         {
             controller.walkSpeed = walkSpeed / 4;
             controller.runSpeed = walkSpeed / 4;
