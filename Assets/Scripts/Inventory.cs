@@ -14,10 +14,11 @@ public class Inventory : MonoBehaviour {
     public Light flashlight = null;
     public FirstPersonController controller = null;
     List<GameObject> items = new List<GameObject>();
-    GameObject equippedItem = null;
     Vector3 eqippedItemPos = new Vector3(1.27f, -0.65f, 1.38f);
+    public GameObject equippedItem { get; private set; }
     public bool hasFlashlight { get; private set; }
     public bool hasKey { get; private set; }
+    public Combat combat;
 
     void Start()
     {
@@ -82,6 +83,7 @@ public class Inventory : MonoBehaviour {
         item.transform.localRotation = Quaternion.identity;
         item.transform.localPosition = eqippedItemPos;
         equippedItem = item;
+        combat.equippedItem = item;
 
         // Enable flashlight effect if flashlight item was equipped
         if (equippedItem.gameObject.name == "Flashlight" && flashlight != null)
