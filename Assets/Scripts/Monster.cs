@@ -30,7 +30,7 @@ public static class Monster {
     }
 
 
-    private static bool canSeePlayer = false;
+    private static bool canSeePlayer;
 
     public static bool CanSeePlayer
     {

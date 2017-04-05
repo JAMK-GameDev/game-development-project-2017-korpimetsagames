@@ -11,24 +11,31 @@ public class MonsterSight : MonoBehaviour {
     private Ray ray;
     public double SightDistance;
     MonsterBehavior behavior;
+    private Vector3 targetDir;
 
     // Use this for initialization
     void Start ()
-    {
-        player = GetComponent<MonsterHead>().player;
+    {        
         monster = transform;
         behavior = monster.parent.parent.GetComponent<MonsterBehavior>();
+        player = behavior.player;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        Vector3 targetDir = player.position - monster.position;
+        CheckForPlayer();        
+    }
+
+    private void CheckForPlayer()
+    {
+        targetDir = player.position - monster.position;
         ray = new Ray(monster.position, targetDir);
 
         // jos säde osuu johonkin && pelaaja on hirviön edessä && etäisyys pelaajaan on riittävän pieni
-        if (Vector3.Angle(monster.forward, targetDir) <= MAX_ANGLE && Physics.Raycast(ray, out hit) &&             
-            hit.collider.tag.Equals("Player") && 
+        if (Vector3.Angle(monster.forward, targetDir) <= MAX_ANGLE &&
+            Physics.Raycast(ray, out hit) &&
+            hit.collider.tag.Equals("Player") &&
             Vector3.Distance(monster.position, player.position) < SightDistance)
         {
             Monster.CanSeePlayer = true;

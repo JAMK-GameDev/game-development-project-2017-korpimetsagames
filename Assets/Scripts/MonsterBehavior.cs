@@ -46,22 +46,23 @@ public class MonsterBehavior : MonoBehaviour {
         surveyStateChangeTimeLimit = 1;
         turnSpeed = Random.Range(50, 200);
         searchLocationsAdded = false;
-        monster = transform;
-        Monster.CurrentState = Monster.MonsterState.Idle;
+        monster = transform;        
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.acceleration = 10;
         navMeshAgent.angularSpeed = 999;
         navMeshAgent.speed = walkSpeed;
-        Monster.OriginalPos = monster.position;
-        Monster.LastKnownPlayerPosition = player.position;
         macroBehavior = GetComponent<MonsterMacroBehavior>();
         body = monster.FindChild("Body");
+        Monster.CurrentState = Monster.MonsterState.Idle;
+        Monster.CanSeePlayer = false;
+        Monster.OriginalPos = monster.position;
+        Monster.LastKnownPlayerPosition = player.position;
     }
     
     void Update()
     {
-        print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition);
+        //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition);
         switch (Monster.CurrentState)
         {
             case Monster.MonsterState.Chase: Chase(); break;
@@ -86,6 +87,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Chase()
     {
+        //print("Chasing");
         navMeshAgent.speed = runSpeed;
         Monster.OriginalPos = monster.position;
 
@@ -96,11 +98,12 @@ public class MonsterBehavior : MonoBehaviour {
         }
 
         body.GetComponent<Renderer>().material.color = Color.red;
-        navMeshAgent.destination = player.position;
+        navMeshAgent.destination = Monster.LastKnownPlayerPosition;
     }
 
     private void Investigate()
     {
+        //print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition);
         // välillä monsteri jää investigateen jumiin, kun sille annettuun sijaintiin ei saa laskettua reittiä
         body.GetComponent<Renderer>().material.color = Color.yellow;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;
@@ -129,6 +132,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Survey()
     {
+        //print("Surveying");
         navMeshAgent.speed = walkSpeed;
 
         if (surveyCount == totalSearches)
@@ -137,12 +141,6 @@ public class MonsterBehavior : MonoBehaviour {
             ResetSurvey();
             return;
         }
-
-
-        /* if(pointsOfInterest!= null)
-         {
-             print("Endpoint: " +pointsOfInterest[surveyCount] + ", monster pos: " + monster.position);
-         }*/
 
         // jos on katseltu ympäriinsä tässä pisteessä riittävän kauan 
         // wasturning siksi ettei monsteri sinkoa muualle kesken kääntymisen (kuuluu olla true)
@@ -198,6 +196,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Search()
     {
+        //print("Searching");
         body.GetComponent<Renderer>().material.color = Color.magenta;
         
         if(!searchLocationsAdded)
@@ -229,6 +228,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Idle()
     {
+        //print("Idle");
         body.GetComponent<Renderer>().material.color = Color.green;
         navMeshAgent.destination = Monster.OriginalPos;
     }

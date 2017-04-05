@@ -5,7 +5,7 @@ using UnityEngine;
 public class MonsterMacroBehavior : MonoBehaviour {
 
     public Terrain terrain;
-    public int waterLevel;
+    //public int waterLevel;
     public float tipDelay;
 
     private MonsterBehavior monsterBehavior;      
@@ -50,12 +50,12 @@ public class MonsterMacroBehavior : MonoBehaviour {
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
         tempHeight = terrain.SampleHeight(searchVector);    
-        while(tempHeight < waterLevel)
+        /*while(tempHeight < waterLevel)
         {
             seed = Random.Range(minDistance, maxDistance);
             searchVector = playerPosVector + (Random.insideUnitCircle * seed);
             tempHeight = terrain.SampleHeight(searchVector);
-        }
+        }*/
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
@@ -70,12 +70,12 @@ public class MonsterMacroBehavior : MonoBehaviour {
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
         tempHeight = terrain.SampleHeight(searchVector);
-        while (tempHeight < waterLevel)
+        /*while (tempHeight < waterLevel)
         {
             seed = Random.Range(minDistance, maxDistance);
             searchVector = playerPosVector + (Random.insideUnitCircle * seed);
             tempHeight = terrain.SampleHeight(searchVector);
-        }
+        }*/
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
