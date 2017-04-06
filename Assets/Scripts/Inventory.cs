@@ -18,13 +18,13 @@ public class Inventory : MonoBehaviour {
     public GameObject equippedItem { get; private set; }
     public bool hasFlashlight { get; private set; }
     public bool hasKey { get; private set; }
+    public bool hasBoatMotor { get; private set; }
     public bool inventoryIsOpen { get; private set; }
     public CombatSystem combatSystem;
 
     void Start()
     {
         ToggleInventoryUI(); // Disable inventory UI at start
-        hasFlashlight = false;
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class Inventory : MonoBehaviour {
         else
         {
             item.SetActive(false);
-            item.transform.parent = GameObject.FindGameObjectWithTag("Inventory").transform;
+            item.transform.parent = transform;
         }
     }
 
@@ -67,7 +67,7 @@ public class Inventory : MonoBehaviour {
         // Check if item can be equipped
         if (!item.GetComponent<ItemData>().canEquip)
         {
-            StartCoroutine(ShowMessage("Cant equip " + item.name + "!", 2));
+            StartCoroutine(ShowMessage("Cant equip that!", 2));
             return;
         }
 
@@ -96,7 +96,7 @@ public class Inventory : MonoBehaviour {
     public void UnequipItem(GameObject item)
     {
         item.SetActive(false);
-        item.transform.parent = GameObject.FindGameObjectWithTag("Inventory").transform;
+        item.transform.parent = transform;
         equippedItem = null;
 
         // Disable flashlight effect if flashlight item was unequipped
