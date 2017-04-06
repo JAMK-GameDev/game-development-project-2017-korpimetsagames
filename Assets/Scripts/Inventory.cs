@@ -18,6 +18,7 @@ public class Inventory : MonoBehaviour {
     public GameObject equippedItem { get; private set; }
     public bool hasFlashlight { get; private set; }
     public bool hasKey { get; private set; }
+    public bool inventoryIsOpen { get; private set; }
     public Combat combat;
 
     void Start()
@@ -112,6 +113,7 @@ public class Inventory : MonoBehaviour {
             inventoryUI.SetActive(!inventoryUI.activeSelf);
             if (inventoryUI.activeSelf)
             {
+                inventoryIsOpen = true;
                 if (controller != null)
                 {
                     controller.DisableMouseLook(true);
@@ -119,6 +121,7 @@ public class Inventory : MonoBehaviour {
             }
             else
             {
+                inventoryIsOpen = false;
                 if (controller != null)
                 {
                     controller.DisableMouseLook(false);
@@ -130,7 +133,13 @@ public class Inventory : MonoBehaviour {
     public void AddinventoryUIButton(GameObject item)
     {
         GameObject go = Instantiate(inventoryUIButton) as GameObject;
-        go.GetComponentInChildren<Text>().text = item.name;
+        Sprite itemSprite = Resources.Load<Sprite>(item.name);
+        if (itemSprite != null) {
+            go.GetComponent<Image>().sprite = itemSprite;
+        }
+        else {
+            go.GetComponentInChildren<Text>().text = item.name;
+        }         
         go.GetComponent<Button>().onClick.AddListener(delegate{ EquipItem(item); });
         go.transform.SetParent(inventoryUIContent, false);
     }

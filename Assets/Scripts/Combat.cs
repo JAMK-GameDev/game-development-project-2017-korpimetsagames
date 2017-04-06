@@ -5,14 +5,17 @@ using UnityEngine;
 public class Combat : MonoBehaviour {
 
     public GameObject equippedItem;
-	
-	void Update () {
+    Inventory inventory;
 
+    void Start() {
+        inventory = GameObject.FindGameObjectWithTag("Inventory").GetComponent<Inventory>();
+    }
+    
+	void Update () {   
         if (Input.GetMouseButtonDown(0) && equippedItem != null && equippedItem.GetComponent<ItemData>().canAttack)
         {
-            Debug.Log("ATTACCCKK!!!");
-            equippedItem.GetComponent<Animation>().Play("Attack");
-        }
-       
+            if (!inventory.inventoryIsOpen)
+                equippedItem.GetComponent<Animation>().Play("Attack");
+        } 
     }
 }
