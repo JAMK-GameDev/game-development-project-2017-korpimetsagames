@@ -19,7 +19,7 @@ public class Inventory : MonoBehaviour {
     public bool hasFlashlight { get; private set; }
     public bool hasKey { get; private set; }
     public bool inventoryIsOpen { get; private set; }
-    public Combat combat;
+    public CombatSystem combatSystem;
 
     void Start()
     {
@@ -84,7 +84,7 @@ public class Inventory : MonoBehaviour {
         item.transform.localRotation = Quaternion.identity;
         item.transform.localPosition = eqippedItemPos;
         equippedItem = item;
-        combat.equippedItem = item;
+        combatSystem.equippedItem = item;
 
         // Enable flashlight effect if flashlight item was equipped
         if (equippedItem.gameObject.name == "Flashlight" && flashlight != null)

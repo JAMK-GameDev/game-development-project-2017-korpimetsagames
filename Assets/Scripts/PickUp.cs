@@ -40,7 +40,7 @@ public class PickUp : MonoBehaviour
 
     void DisableText()
     {
-        GetComponent<Collider>().enabled = false;
+        GetComponent<BoxCollider>().enabled = false; // Disable pick up zone
         uiManager.HideInfo();
         inZone = false;
     }
