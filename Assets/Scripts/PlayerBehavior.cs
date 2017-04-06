@@ -6,7 +6,8 @@ using UnityStandardAssets.Characters.FirstPerson;
 public class PlayerBehavior : MonoBehaviour {
 
     private Transform player;
-    UnityStandardAssets.Characters.FirstPerson.FirstPersonController controller;
+    FirstPersonController controller;
+    Rigidbody rigidBody;
     private float walkSpeed;
     private float runSpeed;
     public Transform monster;
@@ -25,12 +26,16 @@ public class PlayerBehavior : MonoBehaviour {
         player = transform;
         walkSpeed = controller.walkSpeed;
         runSpeed = controller.runSpeed;
+        player.hasChanged = false;
+        Player.IsStationary = true;
+        rigidBody = player.GetComponent<Rigidbody>();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
         //print(Player.FearLevel + ", state: " + Player.CurrentState + ", " + (int)Player.CurrentState);
+        IsPlayerStationaryUpdate();
         CheckForMonster();
         UpdatePlayerState();
     }
@@ -88,6 +93,18 @@ public class PlayerBehavior : MonoBehaviour {
         {
             controller.walkSpeed = walkSpeed;
             controller.runSpeed = runSpeed;
+        }
+    }
+
+    private void IsPlayerStationaryUpdate()
+    {
+        if(rigidBody.IsSleeping())
+        {
+            Player.IsStationary = true;
+        }
+        else
+        {
+            Player.IsStationary = false;
         }
     }
 }

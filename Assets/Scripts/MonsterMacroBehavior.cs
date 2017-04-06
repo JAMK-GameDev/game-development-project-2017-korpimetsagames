@@ -49,13 +49,7 @@ public class MonsterMacroBehavior : MonoBehaviour {
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-        tempHeight = terrain.SampleHeight(searchVector);    
-        /*while(tempHeight < waterLevel)
-        {
-            seed = Random.Range(minDistance, maxDistance);
-            searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-            tempHeight = terrain.SampleHeight(searchVector);
-        }*/
+        tempHeight = terrain.SampleHeight(searchVector);
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
@@ -70,12 +64,6 @@ public class MonsterMacroBehavior : MonoBehaviour {
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
         tempHeight = terrain.SampleHeight(searchVector);
-        /*while (tempHeight < waterLevel)
-        {
-            seed = Random.Range(minDistance, maxDistance);
-            searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-            tempHeight = terrain.SampleHeight(searchVector);
-        }*/
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }

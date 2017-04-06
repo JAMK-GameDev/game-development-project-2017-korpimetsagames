@@ -36,6 +36,15 @@ public static class Player
         set { moveMode = value; }
     }
 
+    private static bool isStationary;
+
+    public static bool IsStationary
+    {
+        get { return isStationary; }
+        set { isStationary = value; }
+    }
+
+
     public static float NoiseLevel
     {
         get
