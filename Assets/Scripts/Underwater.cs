@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Underwater : MonoBehaviour {
 
-    public int waterLevel = 930;
+    public int waterLevel = 20;
 	
     // Use this for initialization
     void Start () {
@@ -16,7 +16,7 @@ public class Underwater : MonoBehaviour {
         if (transform.position.y < waterLevel - 1)
         {
             RenderSettings.fog = true;
-            RenderSettings.fogDensity = 0.2f;
+            RenderSettings.fogDensity = 0.5f;
         }
         else
         {
