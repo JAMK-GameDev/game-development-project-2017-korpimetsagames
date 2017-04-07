@@ -243,10 +243,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private bool PathComplete()
     {
-        Vector2 target = new Vector2(Monster.LastKnownPlayerPosition.x, Monster.LastKnownPlayerPosition.z);
-        Vector2 monst = new Vector2(monster.position.x, monster.position.z);
-        float distance = Vector3.Distance(monst, target);
-
+        float distance = Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition);
         // remainingDistance päivittyy vasta yhden framen päästä siitä kun määränpää on asetettu, vaatii ylimääräisen tarkistuksen.
         if (distance <= navMeshAgent.stoppingDistance && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && navMeshAgent.velocity.sqrMagnitude == 0f)
         {

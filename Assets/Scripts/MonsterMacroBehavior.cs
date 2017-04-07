@@ -45,29 +45,26 @@ public class MonsterMacroBehavior : MonoBehaviour {
     }
 
     public Vector3 BuildPointOfInterestNearPlayer(int minDistance, int maxDistance)
-    {
-        Vector2 playerPosVector = new Vector2(monsterBehavior.player.position.x, monsterBehavior.player.position.z);
-        Vector2 searchVector;
+    {       
+        Vector3 searchVector;
         Vector3 result;
         float tempHeight;
 
         seed = Random.Range(minDistance, maxDistance);
-        searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+        searchVector = player.position + (Random.insideUnitSphere * seed);
         tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
 
     public Vector3 BuildPointOfInterest(int minDistance, int maxDistance)
-    {
-        Vector2 playerPosVector = new Vector2(Monster.LastKnownPlayerPosition.x, Monster.LastKnownPlayerPosition.z);
-        Vector2 searchVector;
+    {        
+        Vector3 searchVector;
         Vector3 result;
-        float tempHeight;
-        
+        float tempHeight;        
 
         seed = Random.Range(minDistance, maxDistance);
-        searchVector = playerPosVector + (Random.insideUnitCircle * seed);
+        searchVector = Monster.LastKnownPlayerPosition + (Random.insideUnitSphere * seed);
         tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
