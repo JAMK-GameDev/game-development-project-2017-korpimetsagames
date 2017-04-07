@@ -117,10 +117,6 @@ public class MonsterBehavior : MonoBehaviour {
             Monster.CurrentState = Monster.MonsterState.Survey;
             return;         
         }
-        else if (navMeshAgent.path.status == NavMeshPathStatus.PathInvalid)
-        {
-            navMeshAgent.SetDestination(Monster.LastKnownPlayerPosition);
-        }
 
         // täytyy tietää tutkitaanko sijaintia joka on randomoitu vai sijaintia jossa pelaaja on havaittu
         // jos pathfinding ei toimi haluttuun lokaatioon, niin täytyy laskea uusi reitti. Ongelma: asynkroninen navmeshagent ei ehdi laskea uutta reittiä ennen tätä if-lausetta. Se jää jumiin.
@@ -243,9 +239,9 @@ public class MonsterBehavior : MonoBehaviour {
 
     private bool PathComplete()
     {
-        float distance = Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition);
+        float distance = Vector3.Distance(monster.position, navMeshAgent.destination);
         // remainingDistance päivittyy vasta yhden framen päästä siitä kun määränpää on asetettu, vaatii ylimääräisen tarkistuksen.
-        if (distance <= navMeshAgent.stoppingDistance && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && navMeshAgent.velocity.sqrMagnitude == 0f)
+        if (distance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && (navMeshAgent.velocity.sqrMagnitude == 0f || !navMeshAgent.hasPath))
         {
             return true;
         }

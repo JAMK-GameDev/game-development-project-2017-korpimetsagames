@@ -49,11 +49,12 @@ public class MonsterMacroBehavior : MonoBehaviour {
         Vector3 searchVector;
         Vector3 result;
         float tempHeight;
+        float playerHeight = (float)1.32;
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = player.position + (Random.insideUnitSphere * seed);
-        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
-        result = new Vector3(searchVector.x, tempHeight, searchVector.y);
+        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector) + playerHeight;
+        result = new Vector3(searchVector.x, tempHeight, searchVector.z);
         return result;
     }
 
@@ -61,12 +62,13 @@ public class MonsterMacroBehavior : MonoBehaviour {
     {        
         Vector3 searchVector;
         Vector3 result;
-        float tempHeight;        
+        float tempHeight;
+        float playerHeight = (float)1.32;
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = Monster.LastKnownPlayerPosition + (Random.insideUnitSphere * seed);
-        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
-        result = new Vector3(searchVector.x, tempHeight, searchVector.y);
+        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector) + playerHeight;
+        result = new Vector3(searchVector.x, tempHeight, searchVector.z);
         return result;
     }
 }
