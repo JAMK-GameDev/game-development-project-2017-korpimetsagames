@@ -27,10 +27,6 @@ namespace FPSSystem
                 h = 1;
                 Player.MoveMode = Player.MoveState.Sneak;
             }
-            else
-            {
-                Player.MoveMode = Player.MoveState.Walk;
-            }
             float lastHeight = charController.height;
             charController.height = Mathf.Lerp(charController.height, h, Time.deltaTime * 5);
             pos.x = player.position.x;

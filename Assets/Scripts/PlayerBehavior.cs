@@ -37,7 +37,8 @@ public class PlayerBehavior : MonoBehaviour {
         //print(Player.FearLevel + ", state: " + Player.CurrentState + ", " + (int)Player.CurrentState);
         IsPlayerStationaryUpdate();
         CheckForMonster();
-        UpdatePlayerState();
+        UpdatePlayerPsyche();
+       // UpdatePlayerMoveState();
     }
 
     private void CheckForMonster()
@@ -58,8 +59,20 @@ public class PlayerBehavior : MonoBehaviour {
             Player.FearLevel -= fearMultiplier / 2 * Time.deltaTime;
         }
     }
+    /*
+    public void UpdatePlayerMoveState()
+    {
+        switch(Player.MoveMode)
+        {
+            case Player.MoveState.Sneak:
+                controller.walkSpeed = walkSpeed / 3;
+                break;
+            case Player.MoveState.Walk:
+                controller.walkSpeed = walkSpeed;
+        }
+    }*/
 
-    private void UpdatePlayerState()
+    private void UpdatePlayerPsyche()
     {
         // jos täytyy siirtyä pelokkaampaan tasoon
         if (Player.FearLevel > 100 && Player.Psyche != Player.PsycheState.Berserk)

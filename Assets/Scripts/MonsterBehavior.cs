@@ -26,6 +26,8 @@ public class MonsterBehavior : MonoBehaviour {
     private NavMeshAgent navMeshAgent;      
     private List<Vector3> pointsOfInterest;
     private MonsterMacroBehavior macroBehavior;
+    private bool waitedForDistanceUpdate;
+    private bool wait;
     
     public enum SurveyState
     {
@@ -46,6 +48,7 @@ public class MonsterBehavior : MonoBehaviour {
         surveyStateChangeTimeLimit = 1;
         turnSpeed = Random.Range(50, 200);
         searchLocationsAdded = false;
+        wait = true;
         monster = transform;        
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -62,7 +65,7 @@ public class MonsterBehavior : MonoBehaviour {
     
     void Update()
     {
-        //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition);
+        //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition + ", monster: " + monster.position + "MonsterState: " + Monster.CurrentState);
         switch (Monster.CurrentState)
         {
             case Monster.MonsterState.Chase: Chase(); break;
@@ -103,15 +106,20 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Investigate()
     {
-        //print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition);
+        print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition +". Stopping distance: " + navMeshAgent.stoppingDistance + ", distance to target: " + Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition));
         // välillä monsteri jää investigateen jumiin, kun sille annettuun sijaintiin ei saa laskettua reittiä
         body.GetComponent<Renderer>().material.color = Color.yellow;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;
-        //print(monster.position + " | " + navMeshAgent.destination +". Stopping distance: " + navMeshAgent.stoppingDistance + ", remaining distance: " + navMeshAgent.remainingDistance + ", pathpending: " + navMeshAgent.pathPending + ", hasPath: " + navMeshAgent.hasPath + ", velocity: " + navMeshAgent.velocity.sqrMagnitude);
-        if (PathComplete())
+        
+        //print("Monster pos: " + monster.position + ", destination pos: " + navMeshAgent.destination +". Stopping distance: " + navMeshAgent.stoppingDistance + ", remaining distance: " + navMeshAgent.remainingDistance + ", pathpending: " + navMeshAgent.pathPending + ", hasPath: " + navMeshAgent.hasPath + ", velocity: " + navMeshAgent.velocity.sqrMagnitude);
+        if(PathComplete())
         {
             Monster.CurrentState = Monster.MonsterState.Survey;
             return;         
+        }
+        else if (navMeshAgent.path.status == NavMeshPathStatus.PathInvalid)
+        {
+            navMeshAgent.SetDestination(Monster.LastKnownPlayerPosition);
         }
 
         // täytyy tietää tutkitaanko sijaintia joka on randomoitu vai sijaintia jossa pelaaja on havaittu
@@ -211,7 +219,7 @@ public class MonsterBehavior : MonoBehaviour {
 
             searchLocationsAdded = true;
         }
-        
+
         navMeshAgent.destination = pointsOfInterest[surveyCount];
 
         if (PathComplete())
@@ -220,7 +228,7 @@ public class MonsterBehavior : MonoBehaviour {
             Monster.CurrentState = Monster.MonsterState.Survey;
             return;
         }
-        else if(!navMeshAgent.hasPath)
+        else if(navMeshAgent.path.status == NavMeshPathStatus.PathInvalid)
         {
             pointsOfInterest[surveyCount] = macroBehavior.BuildPointOfInterest(5, 12);
         }
@@ -235,7 +243,12 @@ public class MonsterBehavior : MonoBehaviour {
 
     private bool PathComplete()
     {
-        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
+        Vector2 target = new Vector2(Monster.LastKnownPlayerPosition.x, Monster.LastKnownPlayerPosition.z);
+        Vector2 monst = new Vector2(monster.position.x, monster.position.z);
+        float distance = Vector3.Distance(monst, target);
+
+        // remainingDistance päivittyy vasta yhden framen päästä siitä kun määränpää on asetettu, vaatii ylimääräisen tarkistuksen.
+        if (distance <= navMeshAgent.stoppingDistance && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && navMeshAgent.velocity.sqrMagnitude == 0f)
         {
             return true;
         }

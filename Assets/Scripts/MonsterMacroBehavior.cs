@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class MonsterMacroBehavior : MonoBehaviour {
 
-    public Terrain terrain;
+   // public Terrain terrain;
     //public int waterLevel;
     public float tipDelay;
 
-    private MonsterBehavior monsterBehavior;      
+    private MonsterBehavior monsterBehavior;
+    private Transform player;
+    private Transform monster;
     private int seed;
 
 	// Use this for initialization
@@ -17,13 +19,15 @@ public class MonsterMacroBehavior : MonoBehaviour {
         seed = 0;
         Monster.LastDetectedPlayerTimer = 0;
         monsterBehavior = GetComponent<MonsterBehavior>();
+        monster = transform;
+        player = monsterBehavior.player;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
         Monster.LastDetectedPlayerTimer += Time.deltaTime;
-        if(Monster.LastDetectedPlayerTimer > tipDelay && Monster.CurrentState == Monster.MonsterState.Idle || Input.GetKey(KeyCode.O))
+        if(Monster.LastDetectedPlayerTimer > tipDelay && Monster.CurrentState == Monster.MonsterState.Idle || Input.GetKey(KeyCode.O) || Vector3.Distance(player.position, monster.position) > 120 && Monster.CurrentState != Monster.MonsterState.Investigate)
         {
             TipMonster();
             Monster.LastDetectedPlayerTimer = 0;
@@ -49,7 +53,7 @@ public class MonsterMacroBehavior : MonoBehaviour {
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-        tempHeight = terrain.SampleHeight(searchVector);
+        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
@@ -60,10 +64,11 @@ public class MonsterMacroBehavior : MonoBehaviour {
         Vector2 searchVector;
         Vector3 result;
         float tempHeight;
+        
 
         seed = Random.Range(minDistance, maxDistance);
         searchVector = playerPosVector + (Random.insideUnitCircle * seed);
-        tempHeight = terrain.SampleHeight(searchVector);
+        tempHeight = Terrain.activeTerrain.SampleHeight(searchVector);
         result = new Vector3(searchVector.x, tempHeight, searchVector.y);
         return result;
     }
