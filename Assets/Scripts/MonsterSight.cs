@@ -9,13 +9,14 @@ public class MonsterSight : MonoBehaviour {
     private Transform monster;
     private RaycastHit hit;
     private Ray ray;
-    public double SightDistance;
+    public float sightMultiplier;
     MonsterBehavior behavior;
     private Vector3 targetDir;
-    private float sightMultiplier;
+    private float movingPlayerBonus;
     private float timeOfDayMultiplier;
+    private float sightDistance;
+    private float distance;
 
-    // Use this for initialization
     void Start ()
     {        
         monster = transform;
@@ -23,12 +24,11 @@ public class MonsterSight : MonoBehaviour {
         player = behavior.player;        
     }
 	
-	// Update is called once per frame
 	void Update ()
     {
         if (Player.IsStationary)
-            sightMultiplier = 1;
-        else sightMultiplier = 2;
+            movingPlayerBonus = 1;
+        else movingPlayerBonus = 2;
 
         //timeOfDayMultiplier = jokuobjektijossain.timeofday.value
         CheckForPlayer();        
@@ -38,15 +38,16 @@ public class MonsterSight : MonoBehaviour {
     {
         targetDir = player.position - monster.position;
         ray = new Ray(monster.position, targetDir);
-        
-        // jos säde osuu johonkin && pelaaja on hirviön edessä && etäisyys pelaajaan on riittävän pieni
+        distance = Vector3.Distance(monster.position, player.position);
+        sightDistance = sightMultiplier * movingPlayerBonus;
+
+        // jos säde osuu pelaajaan && pelaaja on hirviön edessä && etäisyys pelaajaan on riittävän pieni
         if (Vector3.Angle(monster.forward, targetDir) <= MAX_ANGLE &&
             Physics.Raycast(ray, out hit) &&
             hit.collider.tag.Equals("Player") &&
-            Vector3.Distance(monster.position, player.position) < SightDistance * sightMultiplier)
+            distance < sightDistance)
         {
             Monster.CanSeePlayer = true;
-            //Monster.OnRightTrail = true;
             Monster.LastDetectedPlayerTimer = 0;
             Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();

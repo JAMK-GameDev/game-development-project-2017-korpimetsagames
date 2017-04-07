@@ -8,8 +8,10 @@ public class MonsterHearing : MonoBehaviour {
     private Transform monster;
     private Transform player;
     private MonsterBehavior behavior;
-    public double hearingMultiplier;
-	// Use this for initialization
+    public float hearingMultiplier;
+    private float distance;
+    private float hearingDistance;
+
 	void Start ()
     {
         monster = transform.parent.parent.transform;
@@ -17,11 +19,12 @@ public class MonsterHearing : MonoBehaviour {
         player = behavior.player;    
 	}
 	
-	// Update is called once per frame
 	void Update ()
     {
-        // jos pelaajan ja monsterin välimatka riittävän pieni && monster ei valmiiksi näe pelaajaa
-        if (Vector3.Distance(monster.position, player.position) < (hearingMultiplier*Player.NoiseLevel) && Monster.CurrentState != Monster.MonsterState.Chase)
+        distance = Vector3.Distance(monster.position, player.position);
+        hearingDistance = (hearingMultiplier * Player.NoiseLevel);
+
+        if (distance < hearingDistance)
         {            
             Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();
