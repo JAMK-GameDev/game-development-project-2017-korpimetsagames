@@ -13,6 +13,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public float runSpeed = 11.0f;
 
+        public float crouchSpeed = 3.0f;
+
+        private Vector3 pos;
+
         // If true, diagonal speed (when strafing + moving forward or back) can't exceed normal move speed; otherwise it's about 1.4 times faster
         public bool limitDiagonalSpeed = true;
 
@@ -46,6 +50,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 moveDirection = Vector3.zero;
         private bool grounded = false;
         private CharacterController controller;
+        private float charHeight;
         private Transform myTransform;
         private float speed;
         private RaycastHit hit;
@@ -69,6 +74,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             rayDistance = controller.height * .5f + controller.radius;
             slideLimit = controller.slopeLimit - .1f;
             jumpTimer = antiBunnyHopFactor;
+            charHeight = controller.height;
 
             m_Camera = Camera.main;
 			m_MouseLook.Init(transform, m_Camera.transform);
@@ -110,7 +116,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 // If running isn't on a toggle, then use the appropriate speed depending on whether the run button is down
                 if (!toggleRun)
-                    speed = Input.GetButton("Run") ? runSpeed : walkSpeed;
+                {
+                    float h = charHeight;
+                    //speed = Input.GetButton("Run") ? runSpeed : walkSpeed;
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        speed = runSpeed;
+                        Player.MoveMode = Player.MoveState.Run;
+                    }
+                    else if (Input.GetKey(KeyCode.LeftControl))
+                    {
+                        speed = crouchSpeed;
+                        h = 1;                        
+                        Player.MoveMode = Player.MoveState.Sneak;
+                    }
+                    else
+                    {
+                        speed = walkSpeed;
+                        Player.MoveMode = Player.MoveState.Walk;
+                    }
+                    float lastHeight = controller.height;
+                    controller.height = Mathf.Lerp(controller.height, h, Time.deltaTime * 5);
+                    pos.x = myTransform.position.x;
+                    pos.z = myTransform.position.z;
+                    pos.y = myTransform.position.y + (controller.height - lastHeight) / 2;
+                    myTransform.position = pos;
+                }
 
                 // If sliding (and it's allowed), or if we're on an object tagged "Slide", get a vector pointing down the slope we're on
                 if ((sliding && slideWhenOverSlopeLimit) || (slideOnTaggedObjects && hit.collider.tag == "Slide"))

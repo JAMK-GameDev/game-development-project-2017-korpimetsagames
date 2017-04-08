@@ -44,7 +44,6 @@ public static class Player
         set { isStationary = value; }
     }
 
-
     public static float NoiseLevel
     {
         get
@@ -120,4 +119,3 @@ public static class Player
         }
     }
 }
-

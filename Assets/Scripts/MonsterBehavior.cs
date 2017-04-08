@@ -26,8 +26,6 @@ public class MonsterBehavior : MonoBehaviour {
     private NavMeshAgent navMeshAgent;      
     private List<Vector3> pointsOfInterest;
     private MonsterMacroBehavior macroBehavior;
-    private bool waitedForDistanceUpdate;
-    private bool wait;
     
     public enum SurveyState
     {
@@ -48,7 +46,6 @@ public class MonsterBehavior : MonoBehaviour {
         surveyStateChangeTimeLimit = 1;
         turnSpeed = Random.Range(50, 200);
         searchLocationsAdded = false;
-        wait = true;
         monster = transform;        
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -106,7 +103,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Investigate()
     {
-        print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition +". Stopping distance: " + navMeshAgent.stoppingDistance + ", distance to target: " + Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition));
+        //print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition +". Stopping distance: " + navMeshAgent.stoppingDistance + ", distance to target: " + Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition));
         // välillä monsteri jää investigateen jumiin, kun sille annettuun sijaintiin ei saa laskettua reittiä
         body.GetComponent<Renderer>().material.color = Color.yellow;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;

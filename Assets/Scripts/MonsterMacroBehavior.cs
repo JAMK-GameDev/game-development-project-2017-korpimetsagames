@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class MonsterMacroBehavior : MonoBehaviour {
 
-   // public Terrain terrain;
-    //public int waterLevel;
     public float tipDelay;
-
     private MonsterBehavior monsterBehavior;
     private Transform player;
     private Transform monster;
@@ -37,11 +34,10 @@ public class MonsterMacroBehavior : MonoBehaviour {
     public void TipMonster()
     {
         monsterBehavior.ResetSurvey();
-        Vector3 newVector = BuildPointOfInterestNearPlayer(10,15);        
-        //Monster.OnRightTrail = false;
+        Vector3 newVector = BuildPointOfInterestNearPlayer(10,15);   
         Monster.LastKnownPlayerPosition = newVector;
         Monster.OriginalPos = newVector;
-        Monster.CurrentState = Monster.MonsterState.Investigate;        
+        Monster.CurrentState = Monster.MonsterState.Investigate;
     }
 
     public Vector3 BuildPointOfInterestNearPlayer(int minDistance, int maxDistance)
