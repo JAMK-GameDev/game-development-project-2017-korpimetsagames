@@ -6,4 +6,6 @@ public class ItemData : MonoBehaviour {
 
     public bool canEquip = false;
     public bool canAttack = false;
+    public bool isMeleeWep = false;
+    public bool isRangedWep = false;
 }
