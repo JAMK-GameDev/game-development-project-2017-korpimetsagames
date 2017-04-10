@@ -17,7 +17,6 @@ public class ObjectHit : MonoBehaviour {
             {
                 if (hitPoints <= 0)
                 {
-                    Debug.Log("OVI PASKAKS!!!");
                     if (!breakSound.isPlaying) breakSound.Play();
                     StartCoroutine(Destroy(transform.parent.gameObject, breakSound.clip.length));
                 }
@@ -33,6 +32,7 @@ public class ObjectHit : MonoBehaviour {
     IEnumerator Destroy(GameObject go, float delay)
     {
         yield return new WaitForSeconds(delay);
+        // Play ebin destruction anim here
         Destroy(go);
     }
 }
