@@ -16,6 +16,7 @@ public class PlayerBehavior : MonoBehaviour {
     public float fearMultiplier;
     private readonly int MAX_ANGLE = 50;
     Vector3 targetDir;
+    bool isCarryingObject;
 
     // Use this for initialization
     void Start () {
@@ -83,12 +84,12 @@ public class PlayerBehavior : MonoBehaviour {
             Player.FearLevel = 1;
         }
 
-        if((int)Player.Psyche >= (int)Player.PsycheState.Paralyzed)
+        if((int)Player.Psyche >= (int)Player.PsycheState.Paralyzed && !isCarryingObject)
         {
             controller.walkSpeed = walkSpeed / 4;
             controller.runSpeed = walkSpeed / 4;
         }
-        else
+        else if (!isCarryingObject)
         {
             controller.walkSpeed = walkSpeed;
             controller.runSpeed = runSpeed;
@@ -105,5 +106,19 @@ public class PlayerBehavior : MonoBehaviour {
         {
             Player.IsStationary = false;
         }
+    }
+
+    public void CarryObject()
+    {
+        isCarryingObject = true;
+        controller.walkSpeed = 2;
+        controller.runSpeed = 4;
+    }
+
+    public void StopCarryObject()
+    {
+        isCarryingObject = false;
+        controller.walkSpeed = walkSpeed;
+        controller.runSpeed = runSpeed;
     }
 }

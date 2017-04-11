@@ -49,10 +49,38 @@ public class Interact : MonoBehaviour {
                             if (!boat.hasMotor)
                             {
                                 if (inventory.hasBoatMotor)
-                                    uiManager.ShowInfo("Attach motor to the boat? <OK BUTTON HERE>");
+                                {
+                                    boat.hasMotor = true;
+                                    GameObject motor = GameObject.Find("Motor");
+                                    motor.transform.parent = hit.collider.transform;
+                                    motor.transform.localRotation = Quaternion.identity;
+                                    motor.transform.localPosition = new Vector3(0, 0, -2.85f);
+                                    motor.tag = "Untagged";
+                                    motor.GetComponent<CarryObject>().isStationary = true;
+                                    uiManager.ShowInfo("Motor attached to the boat!");
+                                }
                                 else
+                                {
                                     uiManager.ShowInfo("It's an old boat, but it still seems to be intact. The motor is missing however.");
+                                }
                             }
+                            else
+                            {
+                                if (inventory.hasGasoline)
+                                {
+                                    uiManager.ShowInfo("Fuel tank full, lets get the hell out of here!");
+                                }
+                                else
+                                {
+                                    uiManager.ShowInfo("The fuel tank is empty.");
+                                }
+                            }
+                            break;
+
+                        // Interact with motor
+                        case "Motor":
+                            CarryObject obj = hit.collider.transform.GetComponent<CarryObject>();
+                            obj.Carry();
                             break;
 
                         default:

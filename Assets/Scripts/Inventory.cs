@@ -19,9 +19,11 @@ public class Inventory : MonoBehaviour {
     public GameObject equippedItem { get; private set; }
     public bool hasFlashlight { get; private set; }
     public bool hasKey { get; private set; }
-    public bool hasBoatMotor { get; private set; }
+    public bool hasBoatMotor;
+    public bool hasGasoline;
     public bool inventoryIsOpen { get; private set; }
     public CombatSystem combatSystem;
+    CarryObject carryingObject;
 
     void Start()
     {
@@ -52,6 +54,7 @@ public class Inventory : MonoBehaviour {
         AddinventoryUIButton(item);
         if (item.name == "Flashlight") { hasFlashlight = true; }
         if (item.name == "Key") { hasKey = true; }
+        if (item.name == "Jerry can") { hasGasoline = true; }
         if (equippedItem == null && item.GetComponent<ItemData>().canEquip)
         {
             EquipItem(item);
@@ -78,6 +81,12 @@ public class Inventory : MonoBehaviour {
             UnequipItem(equippedItem);
         }
 
+        // Stop carrying object
+        if (carryingObject != null)
+        {
+            carryingObject.StopCarry();
+        }
+
         // Equip the item
         item.SetActive(true);
         item.layer = LayerMask.NameToLayer("Equipped"); // Change layer to prevent clipping
@@ -102,12 +111,35 @@ public class Inventory : MonoBehaviour {
         item.SetActive(false);
         item.transform.parent = transform;
         equippedItem = null;
+        combatSystem.equippedItem = null;
 
         // Disable flashlight effect if flashlight item was unequipped
         if (item.gameObject.name == "Flashlight" && flashlight != null)
         {
             flashlight.enabled = false;
         }
+    }
+
+    public void CarryObject(GameObject obj)
+    {
+        if (equippedItem != null)
+        {
+            UnequipItem(equippedItem);
+        }
+        carryingObject = obj.GetComponent<CarryObject>();
+        obj.layer = LayerMask.NameToLayer("Equipped"); // Change layer to prevent clipping
+        obj.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        obj.transform.localRotation = Quaternion.identity;
+        obj.transform.localPosition = eqippedItemPos;
+    }
+
+    public void DropObject(GameObject obj)
+    {
+        carryingObject = null;
+        obj.layer = LayerMask.NameToLayer("Default");
+        obj.transform.parent = GameObject.Find("Objects").transform;
+        obj.transform.rotation = Quaternion.identity;
+        obj.transform.position = controller.transform.position + new Vector3(0, -0.8f, 0);
     }
 
     void ToggleInventoryUI()
