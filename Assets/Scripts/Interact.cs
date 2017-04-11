@@ -7,6 +7,7 @@ public class Interact : MonoBehaviour {
     public float interactDistance = 5f;
     public Inventory inventory;
     public UIManager uiManager;
+    public GameManager gameManager;
 
     void Update ()
     {
@@ -69,6 +70,7 @@ public class Interact : MonoBehaviour {
                                 if (inventory.hasGasoline)
                                 {
                                     uiManager.ShowInfo("Fuel tank full, lets get the hell out of here!");
+                                    StartCoroutine(Sail());
                                 }
                                 else
                                 {
@@ -96,4 +98,9 @@ public class Interact : MonoBehaviour {
         }
     }
 
+    IEnumerator Sail()
+    {
+        yield return new WaitForSeconds(2);
+        gameManager.EndingBoat();
+    }
 }
