@@ -14,7 +14,7 @@ public class MonsterHearing : MonoBehaviour {
 
 	void Start ()
     {
-        monster = transform.parent.parent.transform;
+        monster = transform.transform;
         behavior = monster.GetComponent<MonsterBehavior>();
         player = behavior.player;    
 	}
