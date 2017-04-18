@@ -32,7 +32,6 @@ public class Interact : MonoBehaviour {
                 else if (tag == "Interactable")
                 {         
                     string name = hit.collider.name;
-                    Debug.Log(hit.collider.name);
                     switch (name)
                     {        
                         // Interact with door
@@ -54,9 +53,10 @@ public class Interact : MonoBehaviour {
                                 {
                                     boat.hasMotor = true;
                                     GameObject motor = GameObject.Find("Motor");
+                                    motor.GetComponent<CarryObject>().StopCarry();
                                     motor.transform.parent = hit.collider.transform;
                                     motor.transform.localRotation = Quaternion.identity;
-                                    motor.transform.localPosition = new Vector3(0, 0, -2.85f);
+                                    motor.transform.localPosition = new Vector3(0, 0, -2.9f);
                                     motor.tag = "Untagged";
                                     motor.GetComponent<CarryObject>().isStationary = true;
                                     uiManager.ShowInfo("Motor attached to the boat!");

@@ -23,8 +23,8 @@ public class CarryObject : MonoBehaviour
     public void Carry()
     {
         if (!isStationary)
-        { 
-            isCarrying = true;
+        {
+            StartCoroutine(StartCarry());
             gameObject.tag = "Untagged";
             if (gameObject.name == "Motor") { inventory.hasBoatMotor = true; }
             player.CarryObject(); // Slow down player
@@ -38,16 +38,16 @@ public class CarryObject : MonoBehaviour
         {
             isCarrying = false;
             gameObject.tag = "Interactable";
-            if (gameObject.name == "Motor") { StartCoroutine(DeleteMotorFromInventory()); }
+            if (gameObject.name == "Motor") { inventory.hasBoatMotor = false; }
             player.StopCarryObject();
             inventory.DropObject(gameObject);
         }
     }
 
-    // Wait a bit before deleting so boat has time to register motor attaching
-    IEnumerator DeleteMotorFromInventory()
+    IEnumerator StartCarry()
     {
-        yield return new WaitForSeconds(2);
-        inventory.hasBoatMotor = false;
+        yield return new WaitForSeconds(1);
+        isCarrying = true;
     }
+
 }
