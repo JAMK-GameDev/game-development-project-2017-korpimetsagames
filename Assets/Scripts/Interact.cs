@@ -32,8 +32,9 @@ public class Interact : MonoBehaviour {
                 else if (tag == "Interactable")
                 {         
                     string name = hit.collider.name;
+                    Debug.Log(hit.collider.name);
                     switch (name)
-                    {
+                    {        
                         // Interact with door
                         case "Door":
                             Door door = hit.collider.transform.parent.GetComponent<Door>();
