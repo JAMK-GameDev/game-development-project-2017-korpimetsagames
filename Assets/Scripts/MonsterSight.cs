@@ -24,7 +24,7 @@ public class MonsterSight : MonoBehaviour {
     void Start ()
     {        
         monster = transform;
-        behavior = monster.parent.parent.GetComponent<MonsterBehavior>();
+        behavior = monster.GetComponent<MonsterBehavior>();
         player = behavior.player;
     }
 	

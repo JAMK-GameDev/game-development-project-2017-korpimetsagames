@@ -1,0 +1,165 @@
+fileFormatVersion: 2
+guid: 08efd0f4174fc614d8426bfea605cefe
+timeCreated: 1492516707
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: body
+    100004: chainhook
+    100006: Chest
+    100008: hair
+    100010: Head
+    100012: Head_end
+    100014: Hip
+    100016: Jaw
+    100018: Jaw_end
+    100020: //RootNode
+    100022: Lamp
+    100024: LeftArm
+    100026: LeftEye
+    100028: LeftEye_end
+    100030: LeftForeArm
+    100032: LeftHand
+    100034: LeftHand_end
+    100036: LeftHoof
+    100038: LeftHoof_end
+    100040: LeftLeg
+    100042: LeftLowerHip
+    100044: LeftShoulder
+    100046: loincloth
+    100048: LowerLeftLeg
+    100050: LowerRightLeg
+    100052: Neck
+    100054: RightArm
+    100056: RightEye
+    100058: RightEye_end
+    100060: RightForeArm
+    100062: RightHand
+    100064: RightHand_end
+    100066: RightHoof
+    100068: RightHoof_end
+    100070: RightLeg
+    100072: RightLowerHip
+    100074: RightShoulder
+    100076: Spine
+    400000: Armature
+    400002: body
+    400004: chainhook
+    400006: Chest
+    400008: hair
+    400010: Head
+    400012: Head_end
+    400014: Hip
+    400016: Jaw
+    400018: Jaw_end
+    400020: //RootNode
+    400022: Lamp
+    400024: LeftArm
+    400026: LeftEye
+    400028: LeftEye_end
+    400030: LeftForeArm
+    400032: LeftHand
+    400034: LeftHand_end
+    400036: LeftHoof
+    400038: LeftHoof_end
+    400040: LeftLeg
+    400042: LeftLowerHip
+    400044: LeftShoulder
+    400046: loincloth
+    400048: LowerLeftLeg
+    400050: LowerRightLeg
+    400052: Neck
+    400054: RightArm
+    400056: RightEye
+    400058: RightEye_end
+    400060: RightForeArm
+    400062: RightHand
+    400064: RightHand_end
+    400066: RightHoof
+    400068: RightHoof_end
+    400070: RightLeg
+    400072: RightLowerHip
+    400074: RightShoulder
+    400076: Spine
+    2300000: chainhook
+    2300002: hair
+    2300004: loincloth
+    3300000: chainhook
+    3300002: hair
+    3300004: loincloth
+    4300000: body
+    4300002: chainhook
+    4300004: hair
+    4300006: loincloth
+    9500000: //RootNode
+    13700000: body
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
