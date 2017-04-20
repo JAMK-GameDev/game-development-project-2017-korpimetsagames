@@ -35,6 +35,10 @@ public class PlayerBehavior : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if(Input.GetKey(KeyCode.L))
+        {
+            GameObject.FindObjectOfType<FirstPersonController>().Die();
+        }
         IsPlayerStationaryUpdate();
         CheckForMonster();
         UpdatePlayerPsyche();

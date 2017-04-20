@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityStandardAssets.Characters.FirstPerson;
 
 // Author
 // Prometheus
@@ -27,7 +28,9 @@ public class MonsterBehavior : MonoBehaviour {
     private List<Vector3> pointsOfInterest;
     private MonsterMacroBehavior macroBehavior;
     private Animator animator;
-    
+    private bool hasCaughtPlayer;
+
+
     public enum SurveyState
     {
         LookLeft,
@@ -39,8 +42,10 @@ public class MonsterBehavior : MonoBehaviour {
     
     void Start()
     {
+        hasCaughtPlayer = false;
         animator = GetComponent<Animator>();
-        animator.SetBool("isAlive", true);
+        animator.SetTrigger("spawn");
+        Monster.Health = 4;
         totalSearches = Random.Range(3, 6);
         surveyTimeLimit = Random.Range(4, 7);
         surveyTimer = 0;
@@ -67,7 +72,8 @@ public class MonsterBehavior : MonoBehaviour {
     {
         //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition + ", monster: " + monster.position + "MonsterState: " + Monster.CurrentState);
         animator.SetFloat("moveSpeed",navMeshAgent.velocity.sqrMagnitude);
-        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);
+        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);    
+
         switch (Monster.CurrentState)
         {
             case Monster.MonsterState.Chase: Chase(); break;
@@ -79,6 +85,25 @@ public class MonsterBehavior : MonoBehaviour {
         }
     }
 
+    public void GetHit()
+    {
+        if(Monster.CurrentState.Equals(Monster.MonsterState.Dead))
+        {
+            return;
+        }
+
+        animator.SetTrigger("isHit");
+        Monster.ReduceHealth();
+        if (Monster.Health <= 0)
+        {
+            Monster.CurrentState = Monster.MonsterState.Dead;
+            animator.SetTrigger("dead");
+            this.enabled = false;
+            GetComponent<MonsterHearing>().enabled = false;
+            GetComponent<MonsterSight>().enabled = false;
+            GetComponent<MonsterMacroBehavior>().enabled = false;
+        }
+    }
 
     public void ResetSurvey()
     {
@@ -92,6 +117,10 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Chase()
     {
+        if(Vector3.Distance(monster.position, player.position) < 3 && !hasCaughtPlayer)
+        {
+            CatchPlayer();
+        }
         //print("Chasing");
         navMeshAgent.speed = runSpeed;
         Monster.OriginalPos = monster.position;
@@ -104,6 +133,17 @@ public class MonsterBehavior : MonoBehaviour {
 
        // body.GetComponent<Renderer>().material.color = Color.red;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;
+    }
+
+    private void CatchPlayer()
+    {
+        hasCaughtPlayer = true;
+        animator.SetTrigger("attack");
+        this.enabled = false;
+        navMeshAgent.Stop();
+        navMeshAgent.velocity = new Vector3(0,0,0);
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EndingDie();
+        GameObject.FindObjectOfType<FirstPersonController>().Die();
     }
 
     private void Investigate()

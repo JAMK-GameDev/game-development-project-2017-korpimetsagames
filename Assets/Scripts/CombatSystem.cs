@@ -76,6 +76,10 @@ public class CombatSystem : MonoBehaviour {
         if (Physics.Raycast(rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
         {
             Debug.Log(hit.collider.name);
+            if(hit.collider.tag == "Enemy")
+            {
+                hit.transform.GetComponent<MonsterBehavior>().GetHit();
+            }
             if (hit.rigidbody != null)
             {
                 hit.rigidbody.AddForce(-hit.normal * hitForce);

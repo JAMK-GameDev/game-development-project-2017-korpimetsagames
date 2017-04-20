@@ -10,7 +10,8 @@ public static class Monster {
         Investigate, // ei näe pelaajaa, liikkuu sinne missä pelaaja viimeksi havaittiin        
         Survey, // saapunut sinne missä pelaaja viimeksi havaittu, katselee ympärilleen mutta ei liiku
         Search, // liikkuu ja tutkii lähimaastoa
-        Idle // ei merkkejä pelaajasta, palaa sijaintiin _mistä_ pelaaja nähtiin
+        Idle, // ei merkkejä pelaajasta, palaa sijaintiin _mistä_ pelaaja nähtiin
+        Dead
     }
 
     private static MonsterState currentState;
@@ -21,6 +22,14 @@ public static class Monster {
         set { currentState = value; }
     }
 
+    private static int health;
+
+    public static int Health
+    {
+        get { return health; }
+        set { health = value; }
+    }
+
     private static float lastDetectedPlayerTimer;
 
     public static float LastDetectedPlayerTimer
@@ -28,7 +37,6 @@ public static class Monster {
         get { return  lastDetectedPlayerTimer; }
         set {  lastDetectedPlayerTimer = value; }
     }
-
 
     private static bool canSeePlayer;
 
@@ -63,5 +71,10 @@ public static class Monster {
     public static void LearnPlayerPosition(Vector3 playerPosition)
     {
         lastKnownPlayerPosition = playerPosition;
+    }
+
+    public static void ReduceHealth()
+    {
+        health = health - 1;
     }
 }
