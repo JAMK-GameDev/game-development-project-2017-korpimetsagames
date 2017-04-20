@@ -62,6 +62,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 contactPoint;
         private bool playerControl = false;
         private int jumpTimer;
+        private bool dead;
 
         [SerializeField] private MouseLook m_MouseLook;
         private Camera m_Camera;
@@ -73,6 +74,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         void Start()
         {
+            dead = false;
             controller = GetComponent<CharacterController>();
             myTransform = transform;
             speed = walkSpeed;
@@ -92,7 +94,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float inputY = Input.GetAxis("Vertical");
             // If both horizontal and vertical are used simultaneously, limit speed (if allowed), so the total doesn't exceed normal move speed
             float inputModifyFactor = (inputX != 0.0f && inputY != 0.0f && limitDiagonalSpeed) ? .7071f : 1.0f;
-
+            
+            if(!dead)
             if (grounded)
             {
                 bool sliding = false;
@@ -221,18 +224,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // Apply gravity
             moveDirection.y -= gravity * Time.deltaTime;
-
             // Move the controller, and set grounded true or false depending on whether we're standing on something
             grounded = (controller.Move(moveDirection * Time.deltaTime) & CollisionFlags.Below) != 0;
+            
         }
 
         void Update()
         {
+
+            if (dead)
+            {
+                controller.height = 0;
+                controller.transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, -90.0f);                
+                return;
+            }
             RotateView();
             // If the run button is set to toggle, then switch between walk/run speed. (We use Update for this...
             // FixedUpdate is a poor place to use GetButtonDown, since it doesn't necessarily run every frame and can miss the event)
             if (toggleRun && grounded && Input.GetButtonDown("Run"))
                 speed = (speed == walkSpeed ? runSpeed : walkSpeed);
+        }
+
+        public void Die()
+        {
+            dead = true;
         }
 
         // Store point that we're in contact with for use in FixedUpdate if needed
