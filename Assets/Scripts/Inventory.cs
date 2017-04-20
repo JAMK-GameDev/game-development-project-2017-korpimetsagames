@@ -137,7 +137,7 @@ public class Inventory : MonoBehaviour {
     {
         carryingObject = null;
         obj.layer = LayerMask.NameToLayer("Default");
-        obj.transform.parent = GameObject.Find("Objects").transform;
+        obj.transform.parent = null;
         obj.transform.rotation = Quaternion.identity;
         obj.transform.position = controller.transform.position + new Vector3(0, -0.8f, 0);
     }
