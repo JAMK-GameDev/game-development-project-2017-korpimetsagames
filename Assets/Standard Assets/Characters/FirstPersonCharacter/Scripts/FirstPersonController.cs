@@ -9,10 +9,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
     [RequireComponent(typeof (CharacterController))]
     public class FirstPersonController : MonoBehaviour
     {
+        const int MAX_STAMINA = 200;
+        public int stamina = MAX_STAMINA;
+
+        public float speed;
         public float walkSpeed = 6.0f;
-
         public float runSpeed = 11.0f;
-
         public float crouchSpeed = 3.0f;
 
         private Vector3 pos;
@@ -52,7 +54,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private CharacterController controller;
         private float charHeight;
         private Transform myTransform;
-        private float speed;
         private RaycastHit hit;
         private float fallStartLevel;
         private bool falling;
@@ -64,6 +65,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         [SerializeField] private MouseLook m_MouseLook;
         private Camera m_Camera;
+
+        private AudioSource playerAudio;
+        public AudioClip audioStaminaLow;
+        public GameObject footStep;
 
         // Use this for initialization
         void Start()
@@ -78,6 +83,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_Camera = Camera.main;
 			m_MouseLook.Init(transform, m_Camera.transform);
+            playerAudio = GetComponent<AudioSource>();
         }
 
         void FixedUpdate()
@@ -117,23 +123,49 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // If running isn't on a toggle, then use the appropriate speed depending on whether the run button is down
                 if (!toggleRun)
                 {
+                    
                     float h = charHeight;
-                    //speed = Input.GetButton("Run") ? runSpeed : walkSpeed;
                     if (Input.GetKey(KeyCode.LeftShift))
                     {
+                        if (stamina <= 0)
+                        {
+                            stamina = 0;
+                        }
+                        else
+                        {
+                            stamina--;
+                        }
                         speed = runSpeed;
                         Player.MoveMode = Player.MoveState.Run;
                     }
                     else if (Input.GetKey(KeyCode.LeftControl))
                     {
+                        if (stamina < MAX_STAMINA) stamina++;
                         speed = crouchSpeed;
                         h = 1;                        
                         Player.MoveMode = Player.MoveState.Sneak;
                     }
                     else
                     {
+                        if (stamina < MAX_STAMINA) stamina++;
                         speed = walkSpeed;
                         Player.MoveMode = Player.MoveState.Walk;
+                    }
+
+                    if (stamina == 0)
+                    {
+                        speed = walkSpeed;
+                        Player.MoveMode = Player.MoveState.Walk;
+                        if (!playerAudio.isPlaying)
+                        {
+                            playerAudio.clip = audioStaminaLow;
+                            playerAudio.pitch = 0.9f;
+                            playerAudio.PlayDelayed(1f);
+                        }
+                    }
+                    else
+                    {
+                        gameObject.GetComponent<AudioSource>().Stop();
                     }
                     float lastHeight = controller.height;
                     controller.height = Mathf.Lerp(controller.height, h, Time.deltaTime * 5);

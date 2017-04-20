@@ -19,18 +19,22 @@ public class Underwater : MonoBehaviour {
 	private Bloom bloomEffect;
 	private Blur blurEffect;
 
+    private AudioSource playerAudio;
+    public AudioClip audioUnderwater;
+
 	// Use this for initialization.
 	void Start ()
 	{
 		bloomEffect = GetComponent<Bloom>();
 		blurEffect = GetComponent<Blur>();
-	}
+        playerAudio = GetComponent<AudioSource>();
+    }
 
 	// Update is called once per frame.
 	void Update () {
 		if (waterLevel < transform.position.y)
-		{
-			RenderSettings.fogDensity = aDensity;
+		{       
+            RenderSettings.fogDensity = aDensity;
 			//RenderSettings.fogColor = aColor;
 
 			bloomEffect.enabled = true;
@@ -41,7 +45,9 @@ public class Underwater : MonoBehaviour {
 		}
 		else
 		{
-			RenderSettings.fogDensity = uDensity;
+            playerAudio.clip = audioUnderwater;
+            if (!playerAudio.isPlaying) playerAudio.Play();
+            RenderSettings.fogDensity = uDensity;
 			//RenderSettings.fogColor = uColor;
 
 			bloomEffect.enabled = false;

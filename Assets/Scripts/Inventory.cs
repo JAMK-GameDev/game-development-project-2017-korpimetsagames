@@ -50,6 +50,7 @@ public class Inventory : MonoBehaviour {
 
     public void AddItem(GameObject item)
     {
+        gameObject.GetComponent<AudioSource>().Play();
         items.Add(item);
         AddinventoryUIButton(item);
         if (item.name == "Flashlight") { hasFlashlight = true; }

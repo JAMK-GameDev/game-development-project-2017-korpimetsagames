@@ -70,6 +70,7 @@ public class Interact : MonoBehaviour {
                             {
                                 if (inventory.hasGasoline)
                                 {
+                                    boat.GetComponent<AudioSource>().Play();
                                     uiManager.ShowInfo("Fuel tank full, lets get the hell out of here!");
                                     StartCoroutine(Sail());
                                 }
