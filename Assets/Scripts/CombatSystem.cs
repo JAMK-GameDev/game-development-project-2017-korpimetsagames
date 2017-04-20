@@ -29,7 +29,8 @@ public class CombatSystem : MonoBehaviour {
             // Melee
             if (equippedItem.GetComponent<ItemData>().isMeleeWep)
             {
-                Attack();
+                if (!isAttacking)
+                    Attack();
             }
             // Ranged
             else if (equippedItem.GetComponent<ItemData>().isRangedWep)
