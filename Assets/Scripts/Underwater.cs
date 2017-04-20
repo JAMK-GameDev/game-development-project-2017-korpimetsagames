@@ -5,6 +5,7 @@ using UnityStandardAssets.ImageEffects;
 
 public class Underwater : MonoBehaviour {
 
+    public bool isUnderwater;
 	public float waterLevel = 0;
 
 	//private Color uColor = new Color(0, 0, 0, 1);
@@ -19,7 +20,7 @@ public class Underwater : MonoBehaviour {
 	private Bloom bloomEffect;
 	private Blur blurEffect;
 
-    private AudioSource playerAudio;
+    private AudioSource audioSrc;
     public AudioClip audioUnderwater;
 
 	// Use this for initialization.
@@ -27,13 +28,15 @@ public class Underwater : MonoBehaviour {
 	{
 		bloomEffect = GetComponent<Bloom>();
 		blurEffect = GetComponent<Blur>();
-        playerAudio = GetComponent<AudioSource>();
+        audioSrc = GetComponent<AudioSource>();
     }
 
 	// Update is called once per frame.
 	void Update () {
 		if (waterLevel < transform.position.y)
-		{       
+		{
+            isUnderwater = false;
+            audioSrc.Stop();
             RenderSettings.fogDensity = aDensity;
 			//RenderSettings.fogColor = aColor;
 
@@ -45,8 +48,9 @@ public class Underwater : MonoBehaviour {
 		}
 		else
 		{
-            playerAudio.clip = audioUnderwater;
-            if (!playerAudio.isPlaying) playerAudio.Play();
+            isUnderwater = true;
+            audioSrc.clip = audioUnderwater;
+            if (!audioSrc.isPlaying) audioSrc.Play();
             RenderSettings.fogDensity = uDensity;
 			//RenderSettings.fogColor = uColor;
 

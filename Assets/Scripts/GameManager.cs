@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
     public GameObject victoryScreen;
     public GameObject defeatScreen;
     bool isSailing;
+    public bool gameOver { get; private set; }
 
     void Update ()
     {
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(delay);
         isSailing = false;
         player.GetComponent<FirstPersonController>().DisableMouseLook(true);
+        gameOver = true;
         if (won)
         {
             victoryScreen.SetActive(true);

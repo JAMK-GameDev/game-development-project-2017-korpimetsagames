@@ -25,7 +25,8 @@ public static class Player
     {
         Walk,
         Sneak,
-        Run
+        Run,
+        Swim
     }
 
     private static MoveState moveMode;
@@ -59,6 +60,9 @@ public static class Player
                     break;                
                 case MoveState.Run:
                     moveModeMultiplier = 2;
+                    break;
+                case MoveState.Swim:
+                    moveModeMultiplier = 1;
                     break;
                 default:
                     throw new System.Exception("Noise level defaulted.");

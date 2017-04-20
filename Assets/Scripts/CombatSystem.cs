@@ -6,6 +6,7 @@ public class CombatSystem : MonoBehaviour {
 
     public GameObject equippedItem;
     public Inventory inventory;
+    public GameManager gameManager;
 
     public AudioClip shoot;
     public AudioClip reload;
@@ -24,7 +25,7 @@ public class CombatSystem : MonoBehaviour {
     bool reloading;
 
     void Update () {   
-        if (Input.GetMouseButtonDown(0) && equippedItem != null && !inventory.inventoryIsOpen)
+        if (Input.GetMouseButtonDown(0) && equippedItem != null && !inventory.inventoryIsOpen && !gameManager.gameOver)
         {
             // Melee
             if (equippedItem.GetComponent<ItemData>().isMeleeWep)

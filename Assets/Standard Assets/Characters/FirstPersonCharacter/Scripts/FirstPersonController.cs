@@ -69,7 +69,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private AudioSource playerAudio;
         public AudioClip audioStaminaLow;
-        public GameObject footStep;
 
         // Use this for initialization
         void Start()
@@ -94,7 +93,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float inputY = Input.GetAxis("Vertical");
             // If both horizontal and vertical are used simultaneously, limit speed (if allowed), so the total doesn't exceed normal move speed
             float inputModifyFactor = (inputX != 0.0f && inputY != 0.0f && limitDiagonalSpeed) ? .7071f : 1.0f;
-            
+
             if(!dead)
             if (grounded)
             {
@@ -248,6 +247,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public void Die()
         {
             dead = true;
+            DisableMouseLook(true);
         }
 
         // Store point that we're in contact with for use in FixedUpdate if needed
