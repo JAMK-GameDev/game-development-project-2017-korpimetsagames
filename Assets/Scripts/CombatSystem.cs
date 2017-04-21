@@ -65,8 +65,11 @@ public class CombatSystem : MonoBehaviour {
 
     void Shoot()
     {
-        Monster.Mood = Monster.Mindset.Excited;
-        Monster.LearnPlayerPosition(GameObject.FindGameObjectWithTag("Player").transform.position);
+        if(Monster.CurrentState != Monster.MonsterState.Dead)
+        {
+            Monster.Mood = Monster.Mindset.Excited;
+            Monster.LearnPlayerPosition(GameObject.FindGameObjectWithTag("Player").transform.position);
+        }        
         equippedItem.GetComponent<AudioSource>().clip = shoot;
         equippedItem.GetComponent<AudioSource>().Play();
         Animation anim = equippedItem.GetComponent<Animation>();
@@ -79,7 +82,7 @@ public class CombatSystem : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
         {
-            Debug.Log(hit.collider.name);
+            //Debug.Log(hit.collider.name);
             if(hit.collider.tag == "Enemy")
             {
                 hit.transform.GetComponent<MonsterBehavior>().GetHit();

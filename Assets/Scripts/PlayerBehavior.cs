@@ -49,13 +49,11 @@ public class PlayerBehavior : MonoBehaviour {
             Physics.Raycast(ray, out hit) &&
             hit.collider.tag.Equals("Enemy"))
         {
-            print(hit.collider.tag);
             Player.FearLevel += fearMultiplier * Time.deltaTime;
         }
         // jos pelaaja ei näe hirviötä
         else
         {
-            print(hit.collider.tag);
             Player.FearLevel -= fearMultiplier / 4 * Time.deltaTime;
         }
         

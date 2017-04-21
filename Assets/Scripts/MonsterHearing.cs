@@ -24,7 +24,7 @@ public class MonsterHearing : MonoBehaviour {
         distance = Vector3.Distance(monster.position, player.position);
         hearingDistance = (hearingMultiplier * Player.NoiseLevel);
 
-        if (distance < hearingDistance)
+        if (distance < hearingDistance && Monster.CurrentState != Monster.MonsterState.Chase)
         {            
             Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();

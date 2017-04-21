@@ -70,7 +70,6 @@ public class MonsterBehavior : MonoBehaviour {
     
     void Update()
     {
-        //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition + ", monster: " + monster.position + "MonsterState: " + Monster.CurrentState);
         animator.SetFloat("moveSpeed",navMeshAgent.velocity.sqrMagnitude);
         animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);
 
@@ -93,7 +92,7 @@ public class MonsterBehavior : MonoBehaviour {
 
     public void GetHit()
     {
-        if(Monster.CurrentState.Equals(Monster.MonsterState.Dead))
+        if(Monster.CurrentState == Monster.MonsterState.Dead)
         {
             return;
         }
@@ -103,12 +102,12 @@ public class MonsterBehavior : MonoBehaviour {
         Monster.ReduceHealth();
         if (Monster.Health <= 0)
         {
-            Monster.CurrentState = Monster.MonsterState.Dead;
-            animator.SetTrigger("dead");
-            this.enabled = false;
             GetComponent<MonsterHearing>().enabled = false;
             GetComponent<MonsterSight>().enabled = false;
             GetComponent<MonsterMacroBehavior>().enabled = false;
+            Monster.CurrentState = Monster.MonsterState.Dead;
+            animator.SetTrigger("dead");
+            this.enabled = false;
         }
     }
 
@@ -136,7 +135,8 @@ public class MonsterBehavior : MonoBehaviour {
     #region STATEMACHINE_STATES
     private void Chase()
     {
-        if (Vector3.Distance(monster.position, player.position) < 3 && !hasCaughtPlayer)
+        print(hasCaughtPlayer + ", " + Vector3.Distance(monster.position, player.position));
+        if (Vector3.Distance(monster.position, player.position) < 3.2 && !hasCaughtPlayer)
         {
             CatchPlayer();
         }
