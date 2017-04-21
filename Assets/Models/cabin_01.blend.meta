@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: dee86fe8693a72a4487859b81c8ad2cd
-timeCreated: 1492740107
+guid: 992c2be60295ff94682b856a1ed8408a
+timeCreated: 1492802135
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -28,6 +28,8 @@ ModelImporter:
     100040: Cube_019
     100042: Cube_020
     100044: Cube_021
+    100046: Cube_022
+    100048: Cube_023
     400000: //RootNode
     400002: Cube
     400004: Cube_001
@@ -51,6 +53,8 @@ ModelImporter:
     400040: Cube_019
     400042: Cube_020
     400044: Cube_021
+    400046: Cube_022
+    400048: Cube_023
     2300000: Cube
     2300002: Cube_001
     2300004: Cube_002
@@ -73,6 +77,8 @@ ModelImporter:
     2300038: Cube_019
     2300040: Cube_020
     2300042: Cube_021
+    2300044: Cube_022
+    2300046: Cube_023
     3300000: Cube
     3300002: Cube_001
     3300004: Cube_002
@@ -95,28 +101,32 @@ ModelImporter:
     3300038: Cube_019
     3300040: Cube_020
     3300042: Cube_021
+    3300044: Cube_022
+    3300046: Cube_023
     4300000: Cube_021
-    4300002: Cube_020
-    4300004: Cube_019
-    4300006: Cube_018
-    4300008: Cube_017
-    4300010: Cube_016
-    4300012: Cube_015
-    4300014: Cube_014
-    4300016: Cube_013
-    4300018: Cube_012
-    4300020: Cube_011
-    4300022: Cube_010
-    4300024: Cube_009
-    4300026: Cube_008
-    4300028: Cube_007
-    4300030: Cube_006
-    4300032: Cube_005
-    4300034: Cube_004
-    4300036: Cube_003
-    4300038: Cube_002
-    4300040: Cube
-    4300042: Cube_001
+    4300002: Cube_023
+    4300004: Cube_022
+    4300006: Cube_006
+    4300008: Cube_005
+    4300010: Cube_004
+    4300012: Cube_020
+    4300014: Cube_019
+    4300016: Cube_018
+    4300018: Cube_017
+    4300020: Cube_016
+    4300022: Cube_015
+    4300024: Cube_014
+    4300026: Cube_013
+    4300028: Cube_012
+    4300030: Cube_011
+    4300032: Cube_010
+    4300034: Cube_009
+    4300036: Cube_008
+    4300038: Cube_007
+    4300040: Cube_003
+    4300042: Cube_002
+    4300044: Cube
+    4300046: Cube_001
     6400000: Cube
     6400002: Cube_001
     6400004: Cube_002
@@ -139,6 +149,8 @@ ModelImporter:
     6400038: Cube_019
     6400040: Cube_020
     6400042: Cube_021
+    6400044: Cube_022
+    6400046: Cube_023
     7400000: Default Take
     9500000: //RootNode
   materials:
