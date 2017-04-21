@@ -35,10 +35,6 @@ public class PlayerBehavior : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if(Input.GetKey(KeyCode.L))
-        {
-            GameObject.FindObjectOfType<FirstPersonController>().Die();
-        }
         IsPlayerStationaryUpdate();
         CheckForMonster();
         UpdatePlayerPsyche();
@@ -48,19 +44,21 @@ public class PlayerBehavior : MonoBehaviour {
     {
         targetDir = monster.position - player.position;
         ray = new Ray(player.position, targetDir);
-
-        // jos säde osuu hirviöön && hirviö on pelaajan edessä edessä
+        // jos säde osuu hirviöön && hirviö on pelaajan edessä
         if (Vector3.Angle(player.forward, targetDir) <= MAX_ANGLE &&
             Physics.Raycast(ray, out hit) &&
             hit.collider.tag.Equals("Enemy"))
         {
+            print(hit.collider.tag);
             Player.FearLevel += fearMultiplier * Time.deltaTime;
         }
         // jos pelaaja ei näe hirviötä
         else
         {
-            Player.FearLevel -= fearMultiplier / 2 * Time.deltaTime;
+            print(hit.collider.tag);
+            Player.FearLevel -= fearMultiplier / 4 * Time.deltaTime;
         }
+        
     }
 
     private void UpdatePlayerPsyche()

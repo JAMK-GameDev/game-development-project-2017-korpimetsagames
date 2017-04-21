@@ -72,7 +72,6 @@ public static class Player
         }
     }
 
-
     private static float fearLevel;
 
     public static float FearLevel
@@ -86,8 +85,10 @@ public static class Player
         switch(psyche)
         {
             case PsycheState.Carefree:
+                Monster.Mood = Monster.Mindset.Calm;
                 break;
             case PsycheState.Stressed:
+                Monster.Mood = Monster.Mindset.Calm;
                 psyche = PsycheState.Carefree;
                 break;
             case PsycheState.Panic:
@@ -111,14 +112,18 @@ public static class Player
                 break;
             case PsycheState.Stressed:
                 psyche = PsycheState.Panic;
+                Monster.Mood = Monster.Mindset.Excited;
                 break;
             case PsycheState.Panic:
                 psyche = PsycheState.Paralyzed;
+                Monster.Mood = Monster.Mindset.Excited;
                 break;
             case PsycheState.Paralyzed:
                 psyche = PsycheState.Berserk;
+                Monster.Mood = Monster.Mindset.Excited;
                 break;
             case PsycheState.Berserk:
+                Monster.Mood = Monster.Mindset.Excited;
                 break;
         }
     }

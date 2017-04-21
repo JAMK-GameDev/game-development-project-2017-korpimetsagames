@@ -11,10 +11,24 @@ public static class Monster {
         Survey, // saapunut sinne missä pelaaja viimeksi havaittu, katselee ympärilleen mutta ei liiku
         Search, // liikkuu ja tutkii lähimaastoa
         Idle, // ei merkkejä pelaajasta, palaa sijaintiin _mistä_ pelaaja nähtiin
-        Dead
+        Dead // slack
     }
 
     private static MonsterState currentState;
+
+    public enum Mindset
+    {
+        Calm,
+        Excited        
+    }
+
+    private static Mindset mood;
+
+    public static Mindset Mood
+    {
+        get { return mood; }
+        set { mood = value; }
+    }
 
     public static MonsterState CurrentState
     {
@@ -46,15 +60,6 @@ public static class Monster {
         set { canSeePlayer = value; }
     }
 
-   /* private static bool onRightTrail = false;
-
-    public static bool OnRightTrail
-    {
-        get { return onRightTrail = false; }
-        set { onRightTrail = value; }
-    }*/
-
-
     private static Vector3 originalPos;
     public static Vector3 OriginalPos
     {
@@ -71,6 +76,7 @@ public static class Monster {
     public static void LearnPlayerPosition(Vector3 playerPosition)
     {
         lastKnownPlayerPosition = playerPosition;
+        currentState = MonsterState.Investigate;
     }
 
     public static void ReduceHealth()

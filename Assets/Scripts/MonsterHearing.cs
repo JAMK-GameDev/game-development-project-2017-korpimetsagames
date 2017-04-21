@@ -29,7 +29,6 @@ public class MonsterHearing : MonoBehaviour {
             Monster.LearnPlayerPosition(player.position);
             behavior.ResetSurvey();
             Monster.LastDetectedPlayerTimer = 0;
-            Monster.CurrentState = Monster.MonsterState.Investigate;
         }
     }
 }

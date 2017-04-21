@@ -65,10 +65,13 @@ public class CombatSystem : MonoBehaviour {
 
     void Shoot()
     {
+        Monster.Mood = Monster.Mindset.Excited;
+        Monster.LearnPlayerPosition(GameObject.FindGameObjectWithTag("Player").transform.position);
         equippedItem.GetComponent<AudioSource>().clip = shoot;
         equippedItem.GetComponent<AudioSource>().Play();
         Animation anim = equippedItem.GetComponent<Animation>();
         anim.Play("Shoot");
+        
         Instantiate(muzzleFlash, gunEnd.transform.position, Quaternion.identity);
         ammoCount--;
         if (ammoCount == 0) { magazineEmpty = true; }

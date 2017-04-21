@@ -72,7 +72,13 @@ public class MonsterBehavior : MonoBehaviour {
     {
         //print("Pelaaja: " + player.position + ", lastKnownPos: " + Monster.LastKnownPlayerPosition + ", monster: " + monster.position + "MonsterState: " + Monster.CurrentState);
         animator.SetFloat("moveSpeed",navMeshAgent.velocity.sqrMagnitude);
-        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);    
+        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);
+
+        switch (Monster.Mood)
+        {
+            case Monster.Mindset.Calm: navMeshAgent.speed = walkSpeed; break;
+            case Monster.Mindset.Excited: navMeshAgent.speed = runSpeed; break;
+        }
 
         switch (Monster.CurrentState)
         {
@@ -92,6 +98,7 @@ public class MonsterBehavior : MonoBehaviour {
             return;
         }
 
+        Monster.LearnPlayerPosition(player.position);
         animator.SetTrigger("isHit");
         Monster.ReduceHealth();
         if (Monster.Health <= 0)
@@ -115,26 +122,6 @@ public class MonsterBehavior : MonoBehaviour {
         surveyTimeLimit = Random.Range(4, 7);
     }
 
-    private void Chase()
-    {
-        if(Vector3.Distance(monster.position, player.position) < 3 && !hasCaughtPlayer)
-        {
-            CatchPlayer();
-        }
-        //print("Chasing");
-        navMeshAgent.speed = runSpeed;
-        Monster.OriginalPos = monster.position;
-
-        if (!Monster.CanSeePlayer)
-        {
-            Monster.CurrentState = Monster.MonsterState.Investigate;
-            return;
-        }
-
-       // body.GetComponent<Renderer>().material.color = Color.red;
-        navMeshAgent.destination = Monster.LastKnownPlayerPosition;
-    }
-
     private void CatchPlayer()
     {
         hasCaughtPlayer = true;
@@ -146,41 +133,38 @@ public class MonsterBehavior : MonoBehaviour {
         GameObject.FindObjectOfType<FirstPersonController>().Die();
     }
 
+    #region STATEMACHINE_STATES
+    private void Chase()
+    {
+        if (Vector3.Distance(monster.position, player.position) < 3 && !hasCaughtPlayer)
+        {
+            CatchPlayer();
+        }
+        
+        Monster.OriginalPos = monster.position;
+
+        if (!Monster.CanSeePlayer)
+        {
+            Monster.CurrentState = Monster.MonsterState.Investigate;
+            return;
+        }
+        
+        navMeshAgent.destination = Monster.LastKnownPlayerPosition;
+    }
+
     private void Investigate()
     {
-        //print("Investigating, my position: " + monster.position + ", target position: " + Monster.LastKnownPlayerPosition +". Stopping distance: " + navMeshAgent.stoppingDistance + ", distance to target: " + Vector3.Distance(monster.position, Monster.LastKnownPlayerPosition));
-        // välillä monsteri jää investigateen jumiin, kun sille annettuun sijaintiin ei saa laskettua reittiä
-        //body.GetComponent<Renderer>().material.color = Color.yellow;
         navMeshAgent.destination = Monster.LastKnownPlayerPosition;
         
-        //print("Monster pos: " + monster.position + ", destination pos: " + navMeshAgent.destination +". Stopping distance: " + navMeshAgent.stoppingDistance + ", remaining distance: " + navMeshAgent.remainingDistance + ", pathpending: " + navMeshAgent.pathPending + ", hasPath: " + navMeshAgent.hasPath + ", velocity: " + navMeshAgent.velocity.sqrMagnitude);
         if(PathComplete())
         {
             Monster.CurrentState = Monster.MonsterState.Survey;
             return;         
         }
-
-        // täytyy tietää tutkitaanko sijaintia joka on randomoitu vai sijaintia jossa pelaaja on havaittu
-        // jos pathfinding ei toimi haluttuun lokaatioon, niin täytyy laskea uusi reitti. Ongelma: asynkroninen navmeshagent ei ehdi laskea uutta reittiä ennen tätä if-lausetta. Se jää jumiin.
-       /* if (!navMeshAgent.hasPath && !Monster.OnRightTrail)
-        {
-            navMeshAgent.ResetPath();
-            navMeshAgent.SetDestination(BuildPointOfInterest());
-            navMeshAgent.Resume();
-        }
-        else if(!navMeshAgent.hasPath && Monster.OnRightTrail)
-        {
-            navMeshAgent.ResetPath();
-            navMeshAgent.SetDestination(Monster.LastKnownPlayerPosition);
-            navMeshAgent.Resume();
-        }*/
     }
 
     private void Survey()
     {
-        //print("Surveying");
-        navMeshAgent.speed = walkSpeed;
-
         if (surveyCount == totalSearches)
         {
             Monster.CurrentState = Monster.MonsterState.Idle;
@@ -237,14 +221,10 @@ public class MonsterBehavior : MonoBehaviour {
 
         surveyStateChangeTimer += Time.deltaTime;
         surveyTimer += Time.deltaTime;
-        //body.GetComponent<Renderer>().material.color = Color.cyan;
     }
 
     private void Search()
-    {
-        //print("Searching");
-       // body.GetComponent<Renderer>().material.color = Color.magenta;
-        
+    {        
         if(!searchLocationsAdded)
         {
             pointsOfInterest = new List<Vector3>();            
@@ -274,15 +254,15 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void Idle()
     {
-        //print("Idle");
-        //body.GetComponent<Renderer>().material.color = Color.green;
         navMeshAgent.destination = Monster.OriginalPos;
     }
+
+    #endregion
 
     private bool PathComplete()
     {
         float distance = Vector3.Distance(monster.position, navMeshAgent.destination);
-        // remainingDistance päivittyy vasta yhden framen päästä siitä kun määränpää on asetettu, vaatii ylimääräisen tarkistuksen.
+        // remainingDistance päivittyy vasta yhden framen päästä siitä kun määränpää on asetettu.
         if (distance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending && (navMeshAgent.velocity.sqrMagnitude == 0f || !navMeshAgent.hasPath))
         {
             return true;
