@@ -12,6 +12,12 @@ public class MonsterBehavior : MonoBehaviour {
     public Transform player;
     public int walkSpeed;
     public int runSpeed;
+    public AudioClip damaged1;
+    public AudioClip damaged2;
+    public AudioClip damaged3;
+    public AudioClip attack;
+    public AudioClip excited;
+    public AudioClip die;
     private float surveyTimeLimit;   // kuinka kauan monsteri kääntyilee korkeintaan
     private float turnSpeed;        // kääntymisnopeus
     private float surveyTimer;      // kuinka kauan monsteri on kääntyillyt paikallaan
@@ -29,7 +35,10 @@ public class MonsterBehavior : MonoBehaviour {
     private MonsterMacroBehavior macroBehavior;
     private Animator animator;
     private bool hasCaughtPlayer;
-
+    private float audioCooldown;
+    private float timeSinceLastAudioPlayed;
+    private AudioClip[] damagedClips;
+    private bool canPlaySound;
 
     public enum SurveyState
     {
@@ -42,6 +51,13 @@ public class MonsterBehavior : MonoBehaviour {
     
     void Start()
     {
+        canPlaySound = true;
+        damagedClips = new AudioClip[3];
+        damagedClips[0] = damaged1;
+        damagedClips[1] = damaged2;
+        damagedClips[2] = damaged3;
+        timeSinceLastAudioPlayed = 0;
+        audioCooldown = 10;
         hasCaughtPlayer = false;
         animator = GetComponent<Animator>();
         animator.SetTrigger("spawn");
@@ -57,8 +73,6 @@ public class MonsterBehavior : MonoBehaviour {
         monster = transform;        
         surveyState = SurveyState.LookForward;
         navMeshAgent = GetComponent<NavMeshAgent>();
-        navMeshAgent.acceleration = 10;
-        navMeshAgent.angularSpeed = 999;
         navMeshAgent.speed = walkSpeed;
         macroBehavior = GetComponent<MonsterMacroBehavior>();
         body = monster.FindChild("Body");
@@ -71,7 +85,7 @@ public class MonsterBehavior : MonoBehaviour {
     void Update()
     {
         animator.SetFloat("moveSpeed",navMeshAgent.velocity.sqrMagnitude);
-        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);
+        animator.SetFloat("animationSpeed", navMeshAgent.velocity.sqrMagnitude/50);        
 
         switch (Monster.Mood)
         {
@@ -92,23 +106,24 @@ public class MonsterBehavior : MonoBehaviour {
 
     public void GetHit()
     {
-        if(Monster.CurrentState == Monster.MonsterState.Dead)
-        {
-            return;
-        }
-
+        if(Monster.CurrentState == Monster.MonsterState.Dead){ return; }                
+        Monster.ReduceHealth();
+        if (Monster.Health <= 0){ Die(); return; }
+        
         Monster.LearnPlayerPosition(player.position);
         animator.SetTrigger("isHit");
-        Monster.ReduceHealth();
-        if (Monster.Health <= 0)
-        {
-            GetComponent<MonsterHearing>().enabled = false;
-            GetComponent<MonsterSight>().enabled = false;
-            GetComponent<MonsterMacroBehavior>().enabled = false;
-            Monster.CurrentState = Monster.MonsterState.Dead;
-            animator.SetTrigger("dead");
-            this.enabled = false;
-        }
+        MakeSound(damagedClips[Random.Range(0, 3)]);
+    }
+
+    private void Die()
+    {
+        MakeSound(die);
+        GetComponent<MonsterHearing>().enabled = false;
+        GetComponent<MonsterSight>().enabled = false;
+        GetComponent<MonsterMacroBehavior>().enabled = false;
+        Monster.CurrentState = Monster.MonsterState.Dead;
+        animator.SetTrigger("dead");
+        this.enabled = false;
     }
 
     public void ResetSurvey()
@@ -130,17 +145,27 @@ public class MonsterBehavior : MonoBehaviour {
         navMeshAgent.velocity = new Vector3(0,0,0);
         GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EndingDie();
         GameObject.FindObjectOfType<FirstPersonController>().Die();
+        MakeSound(attack);
     }
+
+
 
     #region STATEMACHINE_STATES
     private void Chase()
     {
-        print(hasCaughtPlayer + ", " + Vector3.Distance(monster.position, player.position));
-        if (Vector3.Distance(monster.position, player.position) < 3.2 && !hasCaughtPlayer)
+        if (Vector3.Distance(monster.position, player.position) < 3.2 && !hasCaughtPlayer){ CatchPlayer(); }
+        timeSinceLastAudioPlayed += Time.deltaTime;
+        if (timeSinceLastAudioPlayed > audioCooldown)
         {
-            CatchPlayer();
+            canPlaySound = true;
         }
-        
+        if (canPlaySound)
+        {
+            MakeSound(excited);
+            timeSinceLastAudioPlayed = 0;
+            canPlaySound = false;
+        }
+
         Monster.OriginalPos = monster.position;
 
         if (!Monster.CanSeePlayer)
@@ -258,6 +283,12 @@ public class MonsterBehavior : MonoBehaviour {
     }
 
     #endregion
+
+    private void MakeSound(AudioClip clip)
+    {
+        monster.GetComponent<AudioSource>().clip = clip;
+        monster.GetComponent<AudioSource>().Play();
+    }
 
     private bool PathComplete()
     {
