@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
+using UnityStandardAssets.ImageEffects;
 
 public class GameManager : MonoBehaviour {
 
@@ -13,9 +14,14 @@ public class GameManager : MonoBehaviour {
     public GameObject defeatScreen;
     public Text fearDescription;
     public Slider fearLevel;
+    public VignetteAndChromaticAberration deathEffect;
 
     bool isSailing;
+    bool isDead;
     public bool gameOver { get; private set; }
+
+    float lerpTime = 5f;
+    float currentLerpTime;
 
     void Update ()
     {
@@ -23,7 +29,18 @@ public class GameManager : MonoBehaviour {
         {
             boat.transform.position = Vector3.MoveTowards(boat.transform.position, new Vector3(boat.position.x, boat.position.y, boat.position.z + 100), 2f * Time.deltaTime);
         }
-        switch(Player.Psyche)
+        if (isDead)
+        {
+            currentLerpTime += Time.deltaTime;
+            if (currentLerpTime > lerpTime)
+            {
+                currentLerpTime = lerpTime;
+            }
+            float perc = currentLerpTime / lerpTime;
+            deathEffect.intensity = Mathf.Lerp(0, 1, perc);
+            deathEffect.blur = Mathf.Lerp(0, 1, perc * 2);
+        }
+        switch (Player.Psyche)
         {
             case Player.PsycheState.Carefree: fearDescription.text = "Carefree"; break;
             case Player.PsycheState.Stressed: fearDescription.text = "Stressed"; break;
@@ -45,6 +62,9 @@ public class GameManager : MonoBehaviour {
 
     public void EndingDie()
     {
+        GetComponent<AudioSource>().Play();
+        player.GetComponent<CharacterController>().enabled = false;
+        isDead = true;
         StartCoroutine(EndGame(false, 1f));
     }
 
@@ -62,10 +82,18 @@ public class GameManager : MonoBehaviour {
         {
             defeatScreen.SetActive(true);
         }
+        StartCoroutine(EndHeartbeat());   
+    }
+
+    IEnumerator EndHeartbeat()
+    {
+        yield return new WaitForSeconds(6f);
+        GetComponent<AudioSource>().Stop();
     }
 
     public void Restart()
     {
+        GetComponent<AudioSource>().Stop();
         SceneManager.LoadScene("Island");
     }
 
