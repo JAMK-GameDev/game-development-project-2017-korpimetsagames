@@ -9,7 +9,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
     [RequireComponent(typeof (CharacterController))]
     public class FirstPersonController : MonoBehaviour
     {
-        const int MAX_STAMINA = 200;
+        public const int MAX_STAMINA = 200;
         public int stamina = MAX_STAMINA;
 
         public float speed;
@@ -62,7 +62,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 contactPoint;
         private bool playerControl = false;
         private int jumpTimer;
-        private bool dead;
+        public bool dead;
 
         [SerializeField] private MouseLook m_MouseLook;
         private Camera m_Camera;

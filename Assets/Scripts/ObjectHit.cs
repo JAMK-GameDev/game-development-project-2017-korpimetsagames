@@ -6,8 +6,14 @@ public class ObjectHit : MonoBehaviour {
 
     public int hitPoints = 4;
     public CombatSystem combatSystem;
-    public AudioSource hitSound;
-    public AudioSource breakSound;
+    AudioSource src;
+    public AudioClip hitSound;
+    public AudioClip breakSound;
+
+    void Start()
+    {
+        src = GetComponent<AudioSource>();
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -17,13 +23,21 @@ public class ObjectHit : MonoBehaviour {
             {
                 if (hitPoints <= 0)
                 {
-                    if (!breakSound.isPlaying) breakSound.Play();
-                    StartCoroutine(Destroy(transform.gameObject, breakSound.clip.length));
+                    if (!src.isPlaying)
+                    {
+                        src.clip = breakSound;
+                        src.Play();
+                    }
+                    StartCoroutine(Destroy(transform.gameObject, breakSound.length));
                 }
                 else
                 {
                     hitPoints--;
-                    if (!hitSound.isPlaying) hitSound.Play();
+                    if (!src.isPlaying)
+                    {
+                        src.clip = hitSound;
+                        src.Play();
+                    }
                 }
             }
         }
@@ -32,7 +46,7 @@ public class ObjectHit : MonoBehaviour {
     IEnumerator Destroy(GameObject go, float delay)
     {
         yield return new WaitForSeconds(delay);
-        // Play ebin destruction anim here
+        // Play destruction anim here
         Destroy(go);
     }
 }

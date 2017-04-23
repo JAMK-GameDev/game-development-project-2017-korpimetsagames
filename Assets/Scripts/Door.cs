@@ -7,6 +7,7 @@ public class Door : MonoBehaviour {
     public bool isOpen = false;
     public Quaternion originalRotation;
     public float speed = 2f;
+    public AudioClip openSound;
 
 	void Start ()
     {
@@ -30,6 +31,7 @@ public class Door : MonoBehaviour {
     public void ChangeDoorState()
     {
         isOpen = !isOpen;
+        GetComponent<AudioSource>().clip = openSound;
         GetComponent<AudioSource>().Play();
     }
 }

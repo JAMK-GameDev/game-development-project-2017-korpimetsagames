@@ -25,7 +25,7 @@ public class CombatSystem : MonoBehaviour {
     bool reloading;
 
     void Update () {   
-        if (Input.GetMouseButtonDown(0) && equippedItem != null && !inventory.inventoryIsOpen && !gameManager.gameOver)
+        if (Input.GetMouseButtonDown(0) && equippedItem != null && !inventory.inventoryIsOpen && !gameManager.gameOver && !gameManager.cheatConsoleIsOpen)
         {
             // Melee
             if (equippedItem.GetComponent<ItemData>().isMeleeWep)

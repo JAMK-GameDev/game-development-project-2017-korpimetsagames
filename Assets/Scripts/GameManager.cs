@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour {
     public Slider fearLevel;
     public VignetteAndChromaticAberration deathEffect;
     public GameObject cheatConsole;
+    public Inventory inventory;
 
     bool isSailing;
     bool isDead;
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour {
     float lerpTime = 5f;
     float currentLerpTime;
 
+    public bool cheatConsoleIsOpen;
     public bool godmode;
 
     void Update ()
@@ -133,6 +135,7 @@ public class GameManager : MonoBehaviour {
     public void ToggleCheatConsole()
     {
         cheatConsole.SetActive(!cheatConsole.activeSelf);
+        cheatConsoleIsOpen = cheatConsole.activeSelf;
         player.GetComponent<FirstPersonController>().DisableMouseLook(cheatConsole.activeSelf);
     }
 
@@ -140,6 +143,30 @@ public class GameManager : MonoBehaviour {
     public void Godmode(bool b)
     {
         godmode = b;
+    }
+
+    public void AddCrowbar()
+    {
+        GameObject crowbar = GameObject.Find("crowbar");
+        GameObject cheaterCrowbar = Instantiate(crowbar);
+        cheaterCrowbar.name = crowbar.name;
+        inventory.AddItem(cheaterCrowbar);
+    }
+
+    public void AddShotgun()
+    {
+        GameObject shotty = GameObject.Find("shotty");
+        GameObject cheaterShotty = Instantiate(shotty);
+        cheaterShotty.name = shotty.name;
+        inventory.AddItem(cheaterShotty);
+    }
+
+    public void AddDoorKey()
+    {
+        GameObject key = GameObject.Find("Key");
+        GameObject cheaterKey = Instantiate(key);
+        cheaterKey.name = key.name;
+        inventory.AddItem(cheaterKey);
     }
     #endregion
 }

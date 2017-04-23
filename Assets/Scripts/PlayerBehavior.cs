@@ -17,6 +17,7 @@ public class PlayerBehavior : MonoBehaviour {
     private readonly int MAX_ANGLE = 50;
     Vector3 targetDir;
     bool isCarryingObject;
+    public AudioSource heartbeat;
 
     // Use this for initialization
     void Start () {
@@ -49,6 +50,7 @@ public class PlayerBehavior : MonoBehaviour {
             Physics.Raycast(ray, out hit) &&
             hit.collider.tag.Equals("Enemy"))
         {
+            if (!heartbeat.isPlaying && !controller.dead) { heartbeat.Play(); }
             if(Player.Psyche == Player.PsycheState.Carefree)
             {
                 Player.FearLevel += fearMultiplier * Time.deltaTime * 3;
@@ -61,9 +63,9 @@ public class PlayerBehavior : MonoBehaviour {
         // jos pelaaja ei näe hirviötä
         else
         {
+            StartCoroutine(StopHeartbeat(heartbeat.clip.length));
             Player.FearLevel -= fearMultiplier / 30 * Time.deltaTime;
-        }
-        
+        }   
     }
 
     private void UpdatePlayerPsyche()
@@ -127,5 +129,11 @@ public class PlayerBehavior : MonoBehaviour {
         isCarryingObject = false;
         controller.walkSpeed = walkSpeed;
         controller.runSpeed = runSpeed;
+    }
+
+    IEnumerator StopHeartbeat(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        heartbeat.Stop();
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
 using System.Linq;
+using UnityStandardAssets.ImageEffects;
 
 public class Inventory : MonoBehaviour {
 
@@ -24,6 +25,9 @@ public class Inventory : MonoBehaviour {
     public bool inventoryIsOpen { get; private set; }
     public CombatSystem combatSystem;
     CarryObject carryingObject;
+    public AudioClip audioPickup;
+    public AudioClip audioDrink;
+    public MotionBlur drunkEffect;
 
     void Start()
     {
@@ -50,7 +54,9 @@ public class Inventory : MonoBehaviour {
 
     public void AddItem(GameObject item)
     {
+        gameObject.GetComponent<AudioSource>().clip = audioPickup;
         gameObject.GetComponent<AudioSource>().Play();
+        item.GetComponent<ItemData>().itemID = Random.Range(0, 9999).ToString();
         items.Add(item);
         AddinventoryUIButton(item);
         if (item.name == "Flashlight") { hasFlashlight = true; }
@@ -69,8 +75,24 @@ public class Inventory : MonoBehaviour {
 
     public void EquipItem(GameObject item)
     {
+        // Check if item can be used
+        if (item.GetComponent<ItemData>().canUse)
+        {
+            // Alcohol
+            if (item.name == "beer" || item.name == "booze")
+            {
+                RemoveItem(item);
+                gameObject.GetComponent<AudioSource>().clip = audioDrink;
+                gameObject.GetComponent<AudioSource>().Play();
+                drunkEffect.enabled = true;
+                Player.ImproveState();
+                controller.stamina = FirstPersonController.MAX_STAMINA;
+                StartCoroutine(DisableDrunkEffect());
+                return;
+            }
+        }
         // Check if item can be equipped
-        if (!item.GetComponent<ItemData>().canEquip)
+        else if (!item.GetComponent<ItemData>().canEquip)
         {
             StartCoroutine(ShowMessage("Cant equip that!", 2));
             return;
@@ -170,6 +192,7 @@ public class Inventory : MonoBehaviour {
     public void AddinventoryUIButton(GameObject item)
     {
         GameObject go = Instantiate(inventoryUIButton) as GameObject;
+        go.name = item.GetComponent<ItemData>().itemID;
         Sprite itemSprite = Resources.Load<Sprite>(item.name);
         if (itemSprite != null) {
             go.GetComponent<Image>().sprite = itemSprite;
@@ -188,4 +211,16 @@ public class Inventory : MonoBehaviour {
         inventoryUIMessage.text = "";
     }
 
+    IEnumerator DisableDrunkEffect()
+    {
+        yield return new WaitForSeconds(20f);
+        drunkEffect.enabled = false;
+    }
+
+    public void RemoveItem(GameObject item)
+    {
+        GameObject go = GameObject.Find(item.GetComponent<ItemData>().itemID);
+        Destroy(go);
+        items.Remove(item);
+    }
 }
