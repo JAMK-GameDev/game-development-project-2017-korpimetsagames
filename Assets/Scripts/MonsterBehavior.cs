@@ -12,6 +12,7 @@ public class MonsterBehavior : MonoBehaviour {
     public Transform player;
     public int walkSpeed;
     public int runSpeed;
+    public int monsterHealth;
     public AudioClip damaged1;
     public AudioClip damaged2;
     public AudioClip damaged3;
@@ -61,7 +62,6 @@ public class MonsterBehavior : MonoBehaviour {
         hasCaughtPlayer = false;
         animator = GetComponent<Animator>();
         animator.SetTrigger("spawn");
-        Monster.Health = 4;
         totalSearches = Random.Range(3, 6);
         surveyTimeLimit = Random.Range(4, 7);
         surveyTimer = 0;
@@ -80,6 +80,8 @@ public class MonsterBehavior : MonoBehaviour {
         Monster.CanSeePlayer = false;
         Monster.OriginalPos = monster.position;
         Monster.LastKnownPlayerPosition = player.position;
+        Monster.Mood = Monster.Mindset.Calm;
+        Monster.Health = monsterHealth;
     }
     
     void Update()
