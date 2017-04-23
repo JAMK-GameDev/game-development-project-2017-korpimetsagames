@@ -36,7 +36,7 @@ public class Interact : MonoBehaviour {
                     {        
                         // Interact with door
                         case "Door":
-                            Door door = hit.collider.transform.parent.GetComponent<Door>();
+                            Door door = hit.collider.transform.GetComponent<Door>();
                             // Check if player has the key
                             if (inventory.hasKey)
                                 door.ChangeDoorState();
