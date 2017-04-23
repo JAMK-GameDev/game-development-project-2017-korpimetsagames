@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour {
         player.transform.localPosition = new Vector3(0, 1.5f, 0.8f);
         player.GetComponent<CharacterController>().enabled = false;
         isSailing = true;
-        StartCoroutine(EndGame(true, 10f));
+        StartCoroutine(EndGame(true, 15f));
     }
 
     public void EndingDie()
@@ -148,25 +148,19 @@ public class GameManager : MonoBehaviour {
     public void AddCrowbar()
     {
         GameObject crowbar = GameObject.Find("crowbar");
-        GameObject cheaterCrowbar = Instantiate(crowbar);
-        cheaterCrowbar.name = crowbar.name;
-        inventory.AddItem(cheaterCrowbar);
+        inventory.AddItem(crowbar);
     }
 
     public void AddShotgun()
     {
         GameObject shotty = GameObject.Find("shotty");
-        GameObject cheaterShotty = Instantiate(shotty);
-        cheaterShotty.name = shotty.name;
-        inventory.AddItem(cheaterShotty);
+        inventory.AddItem(shotty);
     }
 
     public void AddDoorKey()
     {
         GameObject key = GameObject.Find("Key");
-        GameObject cheaterKey = Instantiate(key);
-        cheaterKey.name = key.name;
-        inventory.AddItem(cheaterKey);
+        inventory.AddItem(key);
     }
     #endregion
 }

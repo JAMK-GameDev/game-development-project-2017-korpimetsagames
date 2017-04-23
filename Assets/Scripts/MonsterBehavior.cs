@@ -122,6 +122,8 @@ public class MonsterBehavior : MonoBehaviour {
         GetComponent<MonsterHearing>().enabled = false;
         GetComponent<MonsterSight>().enabled = false;
         GetComponent<MonsterMacroBehavior>().enabled = false;
+        AudioSource[] audios = GetComponents<AudioSource>();
+        audios[1].enabled = false;
         Monster.CurrentState = Monster.MonsterState.Dead;
         animator.SetTrigger("dead");
         this.enabled = false;
