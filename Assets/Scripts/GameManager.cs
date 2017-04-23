@@ -51,6 +51,11 @@ public class GameManager : MonoBehaviour {
         fearLevel.value = Player.FearLevel;
     }
 
+    public void EndingKillMonster()
+    {
+        StartCoroutine(EndGame(true, 4f));
+    }
+
     public void EndingBoat()
     {
         player.transform.parent = boat.transform;

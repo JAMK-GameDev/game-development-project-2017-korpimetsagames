@@ -125,6 +125,7 @@ public class MonsterBehavior : MonoBehaviour {
         Monster.CurrentState = Monster.MonsterState.Dead;
         animator.SetTrigger("dead");
         this.enabled = false;
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EndingKillMonster();
     }
 
     public void ResetSurvey()
