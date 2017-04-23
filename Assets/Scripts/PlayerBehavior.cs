@@ -49,7 +49,14 @@ public class PlayerBehavior : MonoBehaviour {
             Physics.Raycast(ray, out hit) &&
             hit.collider.tag.Equals("Enemy"))
         {
-            Player.FearLevel += fearMultiplier * Time.deltaTime;
+            if(Player.Psyche == Player.PsycheState.Carefree)
+            {
+                Player.FearLevel += fearMultiplier * Time.deltaTime * 3;
+            }
+            else
+            {
+                Player.FearLevel += fearMultiplier * Time.deltaTime;
+            }
         }
         // jos pelaaja ei näe hirviötä
         else
@@ -68,7 +75,7 @@ public class PlayerBehavior : MonoBehaviour {
             Player.FearLevel = Player.FearLevel % 100;
         }
         // jos täytyy siirtyä huolettomampaan tasoon
-        else if (Player.FearLevel < 0 && Player.Psyche != Player.PsycheState.Carefree)
+        else if (Player.FearLevel < 0 && Player.Psyche != Player.PsycheState.Carefree && Player.Psyche != Player.PsycheState.Stressed)
         {
             Player.ImproveState();
             Player.FearLevel = 99;
@@ -78,8 +85,8 @@ public class PlayerBehavior : MonoBehaviour {
         {
             Player.FearLevel = 99;
         }
-        // jos pelaaja on huoleton, ei lasketa enempää pelkoa
-        else if (Player.FearLevel < 0 && Player.Psyche == Player.PsycheState.Carefree)
+        // jos pelaaja on huoleton tai vain stressaantunut, ei lasketa enempää pelkoa
+        else if (Player.FearLevel < 0 && (Player.Psyche == Player.PsycheState.Carefree || Player.Psyche == Player.PsycheState.Stressed))
         {
             Player.FearLevel = 1;
         }
