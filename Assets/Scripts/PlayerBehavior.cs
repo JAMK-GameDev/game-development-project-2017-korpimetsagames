@@ -54,7 +54,7 @@ public class PlayerBehavior : MonoBehaviour {
         // jos pelaaja ei näe hirviötä
         else
         {
-            Player.FearLevel -= fearMultiplier / 4 * Time.deltaTime;
+            Player.FearLevel -= fearMultiplier / 30 * Time.deltaTime;
         }
         
     }

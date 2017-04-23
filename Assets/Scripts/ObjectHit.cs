@@ -18,7 +18,7 @@ public class ObjectHit : MonoBehaviour {
                 if (hitPoints <= 0)
                 {
                     if (!breakSound.isPlaying) breakSound.Play();
-                    StartCoroutine(Destroy(transform.parent.gameObject, breakSound.clip.length));
+                    StartCoroutine(Destroy(transform.gameObject, breakSound.clip.length));
                 }
                 else
                 {
