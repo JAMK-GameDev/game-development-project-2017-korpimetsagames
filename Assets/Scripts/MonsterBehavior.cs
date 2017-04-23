@@ -91,6 +91,7 @@ public class MonsterBehavior : MonoBehaviour {
         {
             case Monster.Mindset.Calm: navMeshAgent.speed = walkSpeed; break;
             case Monster.Mindset.Excited: navMeshAgent.speed = runSpeed; break;
+            default: break;
         }
 
         switch (Monster.CurrentState)
