@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour {
     public Text fearDescription;
     public Slider fearLevel;
     public VignetteAndChromaticAberration deathEffect;
+    public GameObject cheatConsole;
 
     bool isSailing;
     bool isDead;
@@ -23,12 +24,31 @@ public class GameManager : MonoBehaviour {
     float lerpTime = 5f;
     float currentLerpTime;
 
+    public bool godmode;
+
     void Update ()
     {
+        // Cheats
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ToggleCheatConsole();
+        }
+        if (godmode)
+        {
+            if (player.GetComponent<FirstPersonController>().walkSpeed < 60)
+            {
+                player.GetComponent<FirstPersonController>().walkSpeed = 60;
+                player.GetComponent<FirstPersonController>().runSpeed = 60;
+            }
+        }
+
+        // Move boat
         if (isSailing)
         {
             boat.transform.position = Vector3.MoveTowards(boat.transform.position, new Vector3(boat.position.x, boat.position.y, boat.position.z + 100), 2f * Time.deltaTime);
         }
+
+        // Show death effect
         if (isDead)
         {
             currentLerpTime += Time.deltaTime;
@@ -110,4 +130,16 @@ public class GameManager : MonoBehaviour {
         Application.Quit();
     }
 
+    public void ToggleCheatConsole()
+    {
+        cheatConsole.SetActive(!cheatConsole.activeSelf);
+        player.GetComponent<FirstPersonController>().DisableMouseLook(cheatConsole.activeSelf);
+    }
+
+    #region CHEATS
+    public void Godmode(bool b)
+    {
+        godmode = b;
+    }
+    #endregion
 }

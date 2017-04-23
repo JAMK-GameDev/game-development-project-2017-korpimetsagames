@@ -140,14 +140,17 @@ public class MonsterBehavior : MonoBehaviour {
 
     private void CatchPlayer()
     {
-        hasCaughtPlayer = true;
-        animator.SetTrigger("attack");
-        this.enabled = false;
-        navMeshAgent.Stop();
-        navMeshAgent.velocity = new Vector3(0,0,0);
-        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EndingDie();
-        GameObject.FindObjectOfType<FirstPersonController>().Die();
-        MakeSound(attack);
+        if (!GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().godmode)
+        {
+            animator.SetTrigger("attack");
+            MakeSound(attack);
+            hasCaughtPlayer = true;
+            this.enabled = false;
+            navMeshAgent.Stop();
+            navMeshAgent.velocity = new Vector3(0, 0, 0);
+            GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EndingDie();
+            GameObject.FindObjectOfType<FirstPersonController>().Die();
+        }
     }
 
 
