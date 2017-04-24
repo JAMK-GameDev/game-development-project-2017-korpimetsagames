@@ -9,7 +9,7 @@ public static class Player
         Carefree = 1,
         Stressed = 2,
         Panic = 4,
-        Paralyzed = 6,
+        Paralyzed = 5,
         Berserk = 10           
     }
 
