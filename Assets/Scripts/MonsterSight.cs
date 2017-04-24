@@ -39,14 +39,13 @@ public class MonsterSight : MonoBehaviour {
         targetDir = player.position - monster.position;
         ray = new Ray(monster.position, targetDir);
         distance = Vector3.Distance(monster.position, player.position);
-        flashLightMultiplier = player.GetComponentInChildren<Flashlight>().enabled ? 4 : 1;
+        flashLightMultiplier = player.GetComponentInChildren<Flashlight>().flashlight.enabled ? 4 : 1;
         timeOfDayMultiplier = manager.IsDay ? 2 : 1;
         movingPlayerBonus = Player.IsStationary ? (float)0.5 : (float)1.25;
         if(Player.MoveMode == Player.MoveState.Sneak) { sneakMultiplier = (float)0.5; }
         else if (Player.MoveMode == Player.MoveState.Run) { sneakMultiplier = 1.25f; }
         else { sneakMultiplier = 1; }
         sightDistance = sightMultiplier * movingPlayerBonus * timeOfDayMultiplier * sneakMultiplier * flashLightMultiplier;
-        print(sightDistance);
         // jos säde osuu pelaajaan && pelaaja on hirviön edessä && etäisyys pelaajaan on riittävän pieni
         if (Vector3.Angle(monster.forward, targetDir) <= MAX_ANGLE &&
             Physics.Raycast(ray, out hit) &&
