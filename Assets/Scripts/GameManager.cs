@@ -91,6 +91,8 @@ public class GameManager : MonoBehaviour {
     {
         GetComponent<AudioSource>().Play();
         player.GetComponent<CharacterController>().enabled = false;
+        GameObject.FindObjectOfType<FootStep>().enabled = false;
+        if (inventory.equippedItem != null) { inventory.UnequipItem(inventory.equippedItem); }     
         isDead = true;
         StartCoroutine(EndGame(false, 1f));
     }
