@@ -28,10 +28,16 @@ public class Inventory : MonoBehaviour {
     public AudioClip audioPickup;
     public AudioClip audioDrink;
     public MotionBlur drunkEffect;
+    public GameObject flashlightItem;
 
     void Start()
     {
         ToggleInventoryUI(); // Disable inventory UI at start
+    }
+
+    public void GiveFlashlight()
+    {
+        AddItem(flashlightItem); // Give flashlight to player at start
     }
 
     void Update()
