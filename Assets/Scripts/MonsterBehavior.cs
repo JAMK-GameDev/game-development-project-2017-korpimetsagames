@@ -8,7 +8,7 @@ using UnityStandardAssets.Characters.FirstPerson;
 // Prometheus
 
 public class MonsterBehavior : MonoBehaviour {
-
+    
     public Transform player;
     public int walkSpeed;
     public int runSpeed;
@@ -29,7 +29,6 @@ public class MonsterBehavior : MonoBehaviour {
     private int surveyCount;
     private bool wasTurning;
     private bool searchLocationsAdded;
-    private Transform body;
     private Transform monster;
     private NavMeshAgent navMeshAgent;      
     private List<Vector3> pointsOfInterest;
@@ -40,6 +39,7 @@ public class MonsterBehavior : MonoBehaviour {
     private float timeSinceLastAudioPlayed;
     private AudioClip[] damagedClips;
     private bool canPlaySound;
+    private GameObject[] spawnLocations;
 
     public enum SurveyState
     {
@@ -51,7 +51,7 @@ public class MonsterBehavior : MonoBehaviour {
     private SurveyState surveyState;    
     
     void Start()
-    {
+    {        
         canPlaySound = true;
         damagedClips = new AudioClip[3];
         damagedClips[0] = damaged1;
@@ -75,13 +75,16 @@ public class MonsterBehavior : MonoBehaviour {
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.speed = walkSpeed;
         macroBehavior = GetComponent<MonsterMacroBehavior>();
-        body = monster.FindChild("Body");
         Monster.CurrentState = Monster.MonsterState.Idle;
         Monster.CanSeePlayer = false;
         Monster.OriginalPos = monster.position;
         Monster.LastKnownPlayerPosition = player.position;
         Monster.Mood = Monster.Mindset.Calm;
         Monster.Health = monsterHealth;
+        spawnLocations = GameObject.FindGameObjectsWithTag("EnemySpawnLocation");
+        //Vector3 pos = spawnLocations[Random.Range(0, spawnLocations.Length)].transform.position;
+        //print(pos);
+        //monster.position = pos;
     }
     
     void Update()

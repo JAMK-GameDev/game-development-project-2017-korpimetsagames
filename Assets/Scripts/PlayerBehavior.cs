@@ -30,7 +30,7 @@ public class PlayerBehavior : MonoBehaviour {
         player.hasChanged = false;
         Player.IsStationary = true;
         rigidBody = player.GetComponent<Rigidbody>();
-	}
+    }
 	
 	// Update is called once per frame
 	void Update ()
