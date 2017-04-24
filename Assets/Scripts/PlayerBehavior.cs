@@ -51,7 +51,7 @@ public class PlayerBehavior : MonoBehaviour {
         {
             if(Player.Psyche == Player.PsycheState.Carefree)
             {
-                Player.FearLevel += fearMultiplier * Time.deltaTime * 3;
+                Player.FearLevel += fearMultiplier * Time.deltaTime * 2;
             }
             else
             {
