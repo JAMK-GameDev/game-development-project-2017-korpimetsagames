@@ -12,7 +12,7 @@ public class Underwater : MonoBehaviour {
 	private float uDensity = .05f;
 	
 	//private Color aColor = new Color(0, 0, 0, 1);
-	private float aDensity = .008f;
+	private float aDensity = .016f;
 	
 	public Renderer waterSurface;
 	public Renderer underSurface;
@@ -24,7 +24,7 @@ public class Underwater : MonoBehaviour {
     public AudioClip audioUnderwater;
 
     private GameManager gameManager;
-    public float time = 10.0f;
+    public float time = 30.0f;
     private float elapsedTime;
     
     // Use this for initialization.
