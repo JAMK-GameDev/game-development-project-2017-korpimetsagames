@@ -23,17 +23,23 @@ public class Underwater : MonoBehaviour {
     private AudioSource audioSrc;
     public AudioClip audioUnderwater;
 
-	// Use this for initialization.
-	void Start ()
+    private GameManager gameManager;
+    public float time = 10.0f;
+    private float elapsedTime;
+    
+    // Use this for initialization.
+    void Start ()
 	{
 		bloomEffect = GetComponent<Bloom>();
 		blurEffect = GetComponent<Blur>();
         audioSrc = GetComponent<AudioSource>();
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
 	// Update is called once per frame.
 	void Update () {
-		if (waterLevel < transform.position.y)
+        elapsedTime += Time.deltaTime;
+        if (waterLevel < transform.position.y)
 		{
             isUnderwater = false;
             audioSrc.Stop();
@@ -45,7 +51,12 @@ public class Underwater : MonoBehaviour {
 			
 			waterSurface.enabled = true;
 			underSurface.enabled = false;
-		}
+
+            if (elapsedTime < time)
+            {
+                elapsedTime = 0;
+            }
+        }
 		else
 		{
             isUnderwater = true;
@@ -59,6 +70,11 @@ public class Underwater : MonoBehaviour {
 			
 			waterSurface.enabled = false;
 			underSurface.enabled = true;
-		}
+
+            if (elapsedTime > time)
+            {
+                gameManager.EndingDie();
+            }
+        }
 	}
 }
