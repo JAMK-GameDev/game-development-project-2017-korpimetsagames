@@ -47,7 +47,7 @@ public class PlayerBehavior : MonoBehaviour {
         // jos säde osuu hirviöön && hirviö on pelaajan edessä
         if (Vector3.Angle(player.forward, targetDir) <= MAX_ANGLE &&
             Physics.Raycast(ray, out hit) &&
-            hit.collider.tag.Equals("Enemy"))
+            hit.collider.tag.Equals("Enemy") && Vector3.Distance(monster.position, player.position) < 50)
         {
             if(Player.Psyche == Player.PsycheState.Carefree)
             {
@@ -56,6 +56,19 @@ public class PlayerBehavior : MonoBehaviour {
             else
             {
                 Player.FearLevel += fearMultiplier * Time.deltaTime;
+            }
+        }
+        // jos pelaaja kuulee monsterin
+        else if(Vector3.Distance(monster.position, player.position) < 50)
+        {
+            if (Player.Psyche == Player.PsycheState.Carefree)
+            {
+
+                Player.FearLevel += fearMultiplier * Time.deltaTime;
+            }
+            else
+            {
+                Player.FearLevel += fearMultiplier * Time.deltaTime / 4;
             }
         }
         // jos pelaaja ei näe hirviötä
