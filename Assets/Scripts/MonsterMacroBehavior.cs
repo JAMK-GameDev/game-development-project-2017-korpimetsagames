@@ -24,7 +24,7 @@ public class MonsterMacroBehavior : MonoBehaviour {
 	void Update ()
     {
         Monster.LastDetectedPlayerTimer += Time.deltaTime;
-        if(Monster.LastDetectedPlayerTimer > tipDelay && Monster.CurrentState == Monster.MonsterState.Idle || Input.GetKey(KeyCode.O) || Vector3.Distance(player.position, monster.position) > 120 && Monster.CurrentState != Monster.MonsterState.Investigate)
+        if(Monster.LastDetectedPlayerTimer > tipDelay && Monster.CurrentState == Monster.MonsterState.Idle || Input.GetKey(KeyCode.O) || Vector3.Distance(player.position, monster.position) > 90 && Monster.CurrentState != Monster.MonsterState.Investigate)
         {
             TipMonster();
             Monster.LastDetectedPlayerTimer = 0;
@@ -34,7 +34,7 @@ public class MonsterMacroBehavior : MonoBehaviour {
     public void TipMonster()
     {
         monsterBehavior.ResetSurvey();
-        Vector3 newVector = BuildPointOfInterestNearPlayer(10,15);   
+        Vector3 newVector = BuildPointOfInterestNearPlayer(10,50);   
         Monster.LastKnownPlayerPosition = newVector;
         Monster.OriginalPos = newVector;
         Monster.CurrentState = Monster.MonsterState.Investigate;

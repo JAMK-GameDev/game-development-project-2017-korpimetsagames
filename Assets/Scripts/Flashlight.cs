@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Flashlight : MonoBehaviour {
 
-    Light flashlight;
+    public Light flashlight;
     public AudioClip soundOn;
     public AudioClip soundOff;
     public Inventory inventory;
