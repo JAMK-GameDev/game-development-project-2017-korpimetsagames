@@ -125,31 +125,20 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // If running isn't on a toggle, then use the appropriate speed depending on whether the run button is down
                 if (!toggleRun)
                 {
-                    
                     float h = charHeight;
                     if (Input.GetKey(KeyCode.LeftShift))
                     {
-                        if (stamina <= 0)
-                        {
-                            stamina = 0;
-                        }
-                        else
-                        {
-                            stamina--;
-                        }
                         speed = runSpeed;
                         Player.MoveMode = Player.MoveState.Run;
                     }
                     else if (Input.GetKey(KeyCode.LeftControl))
                     {
-                        if (stamina < MAX_STAMINA) stamina++;
                         speed = crouchSpeed;
                         h = 1;                        
                         Player.MoveMode = Player.MoveState.Sneak;
                     }
                     else
                     {
-                        if (stamina < MAX_STAMINA) stamina++;
                         speed = walkSpeed;
                         Player.MoveMode = Player.MoveState.Walk;
                     }
@@ -230,6 +219,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         void Update()
         {
+            // Lose or regen stamina based on MoveState
+            if (Player.MoveMode == Player.MoveState.Run)
+            {
+                if (stamina <= 0)
+                {
+                    stamina = 0;
+                }
+                else
+                {
+                    stamina--;
+                }
+            }
+            if (stamina < MAX_STAMINA && Player.MoveMode != Player.MoveState.Run)
+            {
+                stamina++;
+            }
 
             if (dead)
             {
