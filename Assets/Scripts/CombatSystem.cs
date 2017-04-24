@@ -13,14 +13,13 @@ public class CombatSystem : MonoBehaviour {
     public GameObject muzzleFlash;
 
     public bool isAttacking { get; private set; }
-    public float fireRate = 0.25f;
     public float weaponRange = 50f;
     public float hitForce = 100f;
     public Transform gunEnd;
     public Camera fpsCam;
-    private WaitForSeconds shotDuration = new WaitForSeconds(.07f);
-    private float nextFire;
     public int ammoCount = 2;
+    public float fireRate = 0.5f;
+    bool allowFire = true;
     bool magazineEmpty;
     bool reloading;
 
@@ -36,10 +35,9 @@ public class CombatSystem : MonoBehaviour {
             // Ranged
             else if (equippedItem.GetComponent<ItemData>().isRangedWep)
             {
-                if (Time.time > nextFire && !magazineEmpty) // check if enough time has passed since player last fired
+                if (allowFire && !magazineEmpty)
                 {
-                    nextFire = Time.time + fireRate;
-                    Shoot();
+                    StartCoroutine(Shoot());
                 }
                 else if (magazineEmpty && !reloading)
                 {
@@ -63,9 +61,10 @@ public class CombatSystem : MonoBehaviour {
         StartCoroutine(StopAttacking(anim.clip.length));
     }
 
-    void Shoot()
+    IEnumerator Shoot()
     {
-        if(Monster.CurrentState != Monster.MonsterState.Dead)
+        allowFire = false;
+        if (Monster.CurrentState != Monster.MonsterState.Dead)
         {
             Monster.Mood = Monster.Mindset.Excited;
             Monster.LearnPlayerPosition(GameObject.FindGameObjectWithTag("Player").transform.position);
@@ -82,7 +81,6 @@ public class CombatSystem : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
         {
-            //Debug.Log(hit.collider.name);
             if(hit.collider.tag == "Enemy")
             {
                 hit.transform.GetComponent<MonsterBehavior>().GetHit();
@@ -92,6 +90,8 @@ public class CombatSystem : MonoBehaviour {
                 hit.rigidbody.AddForce(-hit.normal * hitForce);
             }
         }
+        yield return new WaitForSeconds(fireRate);
+        allowFire = true;
     }
 
     void Reload()

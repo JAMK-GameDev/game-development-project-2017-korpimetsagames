@@ -6,12 +6,34 @@ public class FootStep : MonoBehaviour {
 
     public float stepRate = 1f;
     public float stepCoolDown;
-    public AudioClip footStep;
+    public AudioClip footStepTerrain;
+    public AudioClip footStepFloor;
+    AudioClip footStep;
     public Underwater uw;
+    GameObject player;
+    float distance = 100f;
 
-    // Update is called once per frame
+    void Start()
+    {
+        player = transform.parent.gameObject;
+    }
+
     void Update()
     {
+        // Check surface material and play sound accordingly
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, distance))
+        {
+            if (hit.collider.name == "Terrain")
+            {
+                footStep = footStepTerrain;
+            }
+            else
+            {
+                footStep = footStepFloor;
+            }
+        }
+
         if (Player.MoveMode == Player.MoveState.Walk)
         {
             stepRate = 0.9f;
